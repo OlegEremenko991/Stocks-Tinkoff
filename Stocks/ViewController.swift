@@ -6,16 +6,6 @@
 //  Copyright © 2020 Oleg Eremenko. All rights reserved.
 //
 
-//"symbol": "AAPL",
-//"companyName": "Apple Inc.", "primaryExchange": "Nasdaq Global Select", "sector": "Technology", "calculationPrice": "tops",
-//"open": 154,
-//"openTime": 1506605400394,
-//"close": 153.28,
-//"closeTime": 1506605400394,
-//"high": 154.80,
-//"low": 153.25,
-//"latestPrice": 158.73,
-
 import UIKit
 
 class ViewController: UIViewController {
@@ -27,7 +17,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var priceChangeLabel: UILabel!
     @IBOutlet weak var logoImageView: UIImageView!
     
-    // Private
+    private var tempDictionary: [String: Any] = [:]
+    
+// MARK: Companies for UIPickerView
+    
     private lazy var companies = [
         "Apple": "AAPL",
         "Microsoft": "MSFT",
@@ -35,10 +28,13 @@ class ViewController: UIViewController {
         "Amazon": "AMZN",
         "Facebook": "FB"
     ]
+
+// MARK: Request stocks data and image
     
     private func requestQuote(for symbol: String) {
         let token = "sk_2300dc06c77a4de5a7b9b4301594f733"
-        guard let url1 = URL(string: "https://cloud.iexapis.com/stable/stock/\(symbol)/quote?token=\(token)") else {
+        guard let url1 = URL(string: "https://cloud.iexapis.com/stable/stock/\(symbol)/quote?token=\(token)"),
+            let url2 = URL(string: "https://cloud.iexapis.com/stable/stock/\(symbol)/logo?token=\(token)") else {
             return
         }
         
@@ -51,10 +47,6 @@ class ViewController: UIViewController {
         }
         
         dataTask1.resume()
-        
-        guard let url2 = URL(string: "https://cloud.iexapis.com/stable/stock/\(symbol)/logo?token=\(token)") else {
-            return
-        }
         
         let dataTask2 = URLSession.shared.dataTask(with: url2) { (data, response, error) in
             if let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil {
@@ -79,10 +71,7 @@ class ViewController: UIViewController {
                 let priceChange = json["change"] as? Double else { return print("Invalid JSON") }
             
             DispatchQueue.main.async { [weak self] in
-                self?.displayStockInfo(companyName: companyName,
-                                       companySymbol: companySymbol,
-                                       price: price,
-                                       priceChange: priceChange)
+                self?.displayStockInfo(companyName: companyName, companySymbol: companySymbol, price: price, priceChange: priceChange)
             }
         } catch  {
             print("JSON parsing error: " + error.localizedDescription)
@@ -95,19 +84,16 @@ class ViewController: UIViewController {
             
             guard
                 let json = jsonObject as? [String: Any],
-                let stringURL = json["url"] as? String else { return print("Invalid JSON") }
-                let imageURL = URL(string: stringURL)
+                let stringURL = json["url"] as? String,
+                let imageURL = URL(string: stringURL) else { return print("Invalid JSON") }
             
-                logoImageView.load(url: imageURL!)
+                logoImageView.load(url: imageURL)
         } catch  {
             print("JSON parsing error: " + error.localizedDescription)
         }
     }
     
-    private func displayStockInfo(companyName: String,
-                                  companySymbol: String,
-                                  price: Double,
-                                  priceChange: Double) {
+    private func displayStockInfo(companyName: String, companySymbol: String, price: Double, priceChange: Double) {
         activityIndicator.stopAnimating()
         companyNameLabel.text = companyName
         companySymbolLabel.text = companySymbol
@@ -120,7 +106,7 @@ class ViewController: UIViewController {
         
         let labelArray = [companyNameLabel, companySymbolLabel, priceLabel, priceChangeLabel]
         for x in labelArray {
-            x?.text = "-"
+            x?.text = "..."
             x?.textColor = .black
         }
         logoImageView.image = UIImage(named: "brand")
@@ -161,7 +147,7 @@ extension ViewController: UIPickerViewDataSource {
 
 extension ViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return Array(companies.keys)[row] // why Array?
+        return Array(companies.keys)[row]
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {

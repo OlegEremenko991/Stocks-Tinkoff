@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MainVC: UIViewController {
+class ExtraVC: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var companyPickerView: UIPickerView!
@@ -122,7 +122,7 @@ class MainVC: UIViewController {
 
 }
 
-extension MainVC: UITableViewDataSource {
+extension ExtraVC: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return CGFloat(50)
@@ -152,13 +152,13 @@ extension MainVC: UITableViewDataSource {
     }
 }
 
-extension MainVC: UITableViewDelegate {
+extension ExtraVC: UITableViewDelegate {
 //    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        tableView.deselectRow(at: indexPath, animated: true)
 //    }
 }
 
-extension MainVC: UIPickerViewDataSource {
+extension ExtraVC: UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -170,7 +170,7 @@ extension MainVC: UIPickerViewDataSource {
     
 }
 
-extension MainVC: UIPickerViewDelegate {
+extension ExtraVC: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return Array(companies.keys)[row]
     }

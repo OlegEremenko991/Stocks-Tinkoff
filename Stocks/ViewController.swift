@@ -17,8 +17,6 @@ class ViewController: UIViewController {
     @IBOutlet weak var priceChangeLabel: UILabel!
     @IBOutlet weak var logoImageView: UIImageView!
     
-    private var tempDictionary: [String: Any] = [:]
-    
 // MARK: Companies for UIPickerView
     
     private lazy var companies = [

@@ -7,7 +7,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--V1-->
+        <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Stocks" customModuleProvider="target" sceneMemberID="viewController">
@@ -77,14 +77,8 @@
                                 <rect key="frame" x="0.0" y="544" width="414" height="269"/>
                             </pickerView>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="dkg-R7-M0g">
-                                <rect key="frame" x="197" y="438" width="20" height="20"/>
+                                <rect key="frame" x="197" y="373" width="20" height="20"/>
                             </activityIndicatorView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Idr-ws-dAv">
-                                <rect key="frame" x="176.5" y="478" width="61" height="61"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="Idr-ws-dAv" secondAttribute="height" multiplier="1:1" id="aaK-7M-NfM"/>
-                                </constraints>
-                            </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Stocks" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nie-M5-TQz">
                                 <rect key="frame" x="107" y="54" width="200" height="30"/>
                                 <constraints>
@@ -94,28 +88,34 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Idr-ws-dAv">
+                                <rect key="frame" x="167" y="408" width="80" height="80"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="80" id="OJB-N0-QC6"/>
+                                    <constraint firstAttribute="height" constant="80" id="xgN-fz-IRx"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
                             <constraint firstItem="TVI-Cb-1Yi" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="0fR-Wv-1Mo"/>
                             <constraint firstItem="nie-M5-TQz" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="3IT-sC-CLX"/>
-                            <constraint firstItem="Idr-ws-dAv" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="8xT-WW-JDS"/>
-                            <constraint firstItem="dkg-R7-M0g" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="8yl-iG-ACw"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="TVI-Cb-1Yi" secondAttribute="trailing" id="CfP-YY-GRF"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="TVI-Cb-1Yi" secondAttribute="bottom" id="Fsp-Qw-OPC"/>
                             <constraint firstItem="aIG-yZ-dEa" firstAttribute="top" secondItem="nie-M5-TQz" secondAttribute="bottom" constant="30" id="Mvw-Wc-9CF"/>
+                            <constraint firstItem="Idr-ws-dAv" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="QcU-vw-OnV"/>
                             <constraint firstItem="TIL-EO-Wna" firstAttribute="top" secondItem="nie-M5-TQz" secondAttribute="bottom" constant="30" id="TUg-2J-ReP"/>
-                            <constraint firstItem="dkg-R7-M0g" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="WQD-lK-B0B"/>
                             <constraint firstItem="TVI-Cb-1Yi" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" multiplier="0.3" id="cjw-nT-Rid"/>
-                            <constraint firstItem="TVI-Cb-1Yi" firstAttribute="top" secondItem="Idr-ws-dAv" secondAttribute="bottom" constant="5" id="da5-w3-7F6"/>
-                            <constraint firstItem="Idr-ws-dAv" firstAttribute="top" secondItem="dkg-R7-M0g" secondAttribute="bottom" constant="20" id="gpV-qH-IEe"/>
+                            <constraint firstItem="dkg-R7-M0g" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="iz8-91-OSs"/>
+                            <constraint firstItem="Idr-ws-dAv" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="jxG-mc-jca"/>
                             <constraint firstItem="nie-M5-TQz" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="mbY-1i-puX"/>
+                            <constraint firstItem="Idr-ws-dAv" firstAttribute="top" secondItem="dkg-R7-M0g" secondAttribute="bottom" constant="15" id="oOX-PQ-zrX"/>
                             <constraint firstItem="TIL-EO-Wna" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="40" id="rul-M1-azU"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="aIG-yZ-dEa" secondAttribute="trailing" constant="40" id="sD3-Gd-a5R"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="V1" id="NvW-rg-JVi"/>
+                    <tabBarItem key="tabBarItem" systemItem="search" id="NvW-rg-JVi"/>
                     <connections>
                         <outlet property="activityIndicator" destination="dkg-R7-M0g" id="PAE-4H-TdD"/>
                         <outlet property="companyNameLabel" destination="X6K-NW-pfA" id="21e-Kc-e5a"/>
@@ -221,11 +221,11 @@
             </objects>
             <point key="canvasLocation" x="3194.202898550725" y="116.51785714285714"/>
         </scene>
-        <!--V2-->
+        <!--TableView-->
         <scene sceneID="LXl-mS-je6">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="qdV-Co-cXJ" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="V2" id="YTJ-92-61t"/>
+                    <tabBarItem key="tabBarItem" title="TableView" image="table" catalog="system" id="YTJ-92-61t"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="OUs-jS-YVs">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -260,4 +260,7 @@
             <point key="canvasLocation" x="137.68115942028987" y="116.51785714285714"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="table" catalog="system" width="128" height="93"/>
+    </resources>
 </document>

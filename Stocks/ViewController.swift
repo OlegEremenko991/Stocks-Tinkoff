@@ -107,7 +107,6 @@ class ViewController: UIViewController {
         let labelArray = [companyNameLabel, companySymbolLabel, priceLabel, priceChangeLabel]
         for x in labelArray {
             x?.text = "..."
-            x?.textColor = .black
         }
         logoImageView.image = UIImage(named: "brand")
         

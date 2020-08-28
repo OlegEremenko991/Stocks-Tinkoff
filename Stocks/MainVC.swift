@@ -40,7 +40,7 @@ class MainVC: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 1))
-        tableView.isUserInteractionEnabled = false
+//        tableView.isUserInteractionEnabled = false
     }
     
     private func setupPickerView() {
@@ -52,8 +52,6 @@ class MainVC: UIViewController {
         activityIndicator.startAnimating()
         
         logoImageView.image = UIImage(named: "brand")
-        logoImageView.backgroundColor = .white
-        logoImageView.layer.cornerRadius = 10
         logoImageView.contentMode = .scaleAspectFit
         
         let selectedRow = companyPickerView.selectedRow(inComponent: 0)

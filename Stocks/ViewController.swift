@@ -97,6 +97,11 @@ class ViewController: UIViewController {
         companySymbolLabel.text = companySymbol
         priceLabel.text = "\(price)"
         priceChangeLabel.text = "\(priceChange)"
+        if priceChange > 0 {
+            priceChangeLabel.textColor = .green
+        } else if priceChange < 0 {
+            priceChangeLabel.textColor = .red
+        }
     }
     
     private func requestQuoteUpdate() {
@@ -105,6 +110,14 @@ class ViewController: UIViewController {
         let labelArray = [companyNameLabel, companySymbolLabel, priceLabel, priceChangeLabel]
         for x in labelArray {
             x?.text = "..."
+            x?.textColor = UIColor { tc in
+                switch tc.userInterfaceStyle {
+                case .dark:
+                    return UIColor.white
+                default:
+                    return UIColor.black
+                }
+            }
         }
         logoImageView.image = UIImage(named: "brand")
         

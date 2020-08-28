@@ -7,7 +7,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Item-->
+        <!--V1-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Stocks" customModuleProvider="target" sceneMemberID="viewController">
@@ -115,7 +115,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Item" id="NvW-rg-JVi"/>
+                    <tabBarItem key="tabBarItem" title="V1" id="NvW-rg-JVi"/>
                     <connections>
                         <outlet property="activityIndicator" destination="dkg-R7-M0g" id="PAE-4H-TdD"/>
                         <outlet property="companyNameLabel" destination="X6K-NW-pfA" id="21e-Kc-e5a"/>
@@ -142,7 +142,7 @@
                                 <rect key="frame" x="0.0" y="544" width="414" height="269"/>
                             </pickerView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="aaq-yT-d0w">
-                                <rect key="frame" x="0.0" y="88" width="414" height="269"/>
+                                <rect key="frame" x="0.0" y="181" width="414" height="363"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell1" id="U5z-Li-QpR" customClass="TableViewCell1" customModule="Stocks" customModuleProvider="target">
@@ -181,31 +181,31 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="DiE-Yo-gh4">
-                                <rect key="frame" x="197" y="367" width="20" height="20"/>
-                            </activityIndicatorView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7PJ-si-EKi">
-                                <rect key="frame" x="148.5" y="407" width="117" height="117"/>
+                                <rect key="frame" x="157" y="93" width="100" height="80"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="7PJ-si-EKi" secondAttribute="height" multiplier="1:1" id="a32-3R-b5t"/>
+                                    <constraint firstAttribute="height" constant="80" id="NFV-XP-gQJ"/>
+                                    <constraint firstAttribute="width" constant="100" id="nCg-uf-wuE"/>
                                 </constraints>
                             </imageView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="DiE-Yo-gh4">
+                                <rect key="frame" x="197" y="438" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="aaq-yT-d0w" firstAttribute="top" secondItem="ASr-L7-t5w" secondAttribute="top" id="4Vr-s6-2Kn"/>
-                            <constraint firstItem="jYm-TG-C67" firstAttribute="top" secondItem="7PJ-si-EKi" secondAttribute="bottom" constant="20" id="AZZ-WR-X5m"/>
+                            <constraint firstItem="DiE-Yo-gh4" firstAttribute="centerX" secondItem="ljd-6N-P5i" secondAttribute="centerX" id="5Bg-Ey-y6f"/>
+                            <constraint firstItem="DiE-Yo-gh4" firstAttribute="centerY" secondItem="ljd-6N-P5i" secondAttribute="centerY" id="9pi-h3-U25"/>
+                            <constraint firstItem="aaq-yT-d0w" firstAttribute="top" secondItem="7PJ-si-EKi" secondAttribute="bottom" constant="8" id="JuE-w6-AMY"/>
+                            <constraint firstItem="7PJ-si-EKi" firstAttribute="top" secondItem="ASr-L7-t5w" secondAttribute="top" constant="5" id="Kal-yL-Y5s"/>
+                            <constraint firstItem="7PJ-si-EKi" firstAttribute="centerX" secondItem="ljd-6N-P5i" secondAttribute="centerX" id="M2q-AB-X7u"/>
                             <constraint firstItem="aaq-yT-d0w" firstAttribute="leading" secondItem="ASr-L7-t5w" secondAttribute="leading" id="OOX-C2-dls"/>
                             <constraint firstItem="ASr-L7-t5w" firstAttribute="trailing" secondItem="aaq-yT-d0w" secondAttribute="trailing" id="OaG-To-zhR"/>
                             <constraint firstItem="jYm-TG-C67" firstAttribute="bottom" secondItem="ASr-L7-t5w" secondAttribute="bottom" id="cHQ-30-bJs"/>
-                            <constraint firstItem="aaq-yT-d0w" firstAttribute="height" secondItem="ljd-6N-P5i" secondAttribute="height" multiplier="0.3" id="ka9-59-rJa"/>
                             <constraint firstItem="jYm-TG-C67" firstAttribute="leading" secondItem="ASr-L7-t5w" secondAttribute="leading" id="mUK-xf-cXQ"/>
-                            <constraint firstItem="DiE-Yo-gh4" firstAttribute="top" secondItem="aaq-yT-d0w" secondAttribute="bottom" constant="10" id="oPx-6X-dBn"/>
-                            <constraint firstItem="7PJ-si-EKi" firstAttribute="top" secondItem="DiE-Yo-gh4" secondAttribute="bottom" constant="20" id="okA-7f-UY9"/>
                             <constraint firstItem="jYm-TG-C67" firstAttribute="trailing" secondItem="ASr-L7-t5w" secondAttribute="trailing" id="tlP-I9-Kpq"/>
                             <constraint firstItem="jYm-TG-C67" firstAttribute="height" secondItem="ljd-6N-P5i" secondAttribute="height" multiplier="0.3" id="ts4-wO-7yn"/>
-                            <constraint firstItem="DiE-Yo-gh4" firstAttribute="centerX" secondItem="ljd-6N-P5i" secondAttribute="centerX" id="xgP-wi-JgU"/>
-                            <constraint firstItem="7PJ-si-EKi" firstAttribute="centerX" secondItem="ljd-6N-P5i" secondAttribute="centerX" id="yWF-sQ-nIh"/>
+                            <constraint firstItem="jYm-TG-C67" firstAttribute="top" secondItem="aaq-yT-d0w" secondAttribute="bottom" id="zMo-Or-tL1"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ASr-L7-t5w"/>
                     </view>
@@ -221,11 +221,11 @@
             </objects>
             <point key="canvasLocation" x="3194.202898550725" y="116.51785714285714"/>
         </scene>
-        <!--Item-->
+        <!--V2-->
         <scene sceneID="LXl-mS-je6">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="qdV-Co-cXJ" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="YTJ-92-61t"/>
+                    <tabBarItem key="tabBarItem" title="V2" id="YTJ-92-61t"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="OUs-jS-YVs">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -246,6 +246,7 @@
                 <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="lRS-CW-vJh" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="jNQ-Dc-Ahq">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>

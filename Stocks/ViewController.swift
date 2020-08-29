@@ -9,6 +9,10 @@
 import UIKit
 import MessageUI
 
+enum ErrorType {
+    case companies, companyData, companyLogo
+}
+
 class ViewController: UIViewController {
     @IBOutlet weak var companyNameLabel: UILabel!
     @IBOutlet weak var companyPickerView: UIPickerView!
@@ -19,15 +23,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var logoImageView: UIImageView!
     
     private lazy var devEmail = "support_stocks@gmail.com"
+    
 // MARK: Companies for UIPickerView
-//
-//    private lazy var companies = [
-//        "Apple": "AAPL",
-//        "Microsoft": "MSFT",
-//        "Google": "GOOG",
-//        "Amazon": "AMZN",
-//        "Facebook": "FB"
-//    ]
     
     private var companiesArray = [Company]()
 
@@ -165,8 +162,10 @@ class ViewController: UIViewController {
             }
         }
         
+        companyNameLabel.numberOfLines = 2
         logoImageView.image = UIImage(named: "brand")
         logoImageView.backgroundColor = .white
+        logoImageView.layer.cornerRadius = 10
         
         let selectedRow = companyPickerView.selectedRow(inComponent: 0)
         let selectedSymbol = companiesArray[selectedRow].symbol

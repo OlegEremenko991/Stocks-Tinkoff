@@ -9,8 +9,8 @@
 import Foundation
 
 enum ErrorType {
-    case companies
-    case stocksData
-    case companyLogo
+    case noCompanies
+    case noQuote
+    case noLogo
     case invalidData
 }

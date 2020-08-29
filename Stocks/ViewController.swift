@@ -18,47 +18,61 @@ class ViewController: UIViewController {
     @IBOutlet weak var priceChangeLabel: UILabel!
     @IBOutlet weak var logoImageView: UIImageView!
     
-    private var symbol: String?
-    private let token = "sk_2300dc06c77a4de5a7b9b4301594f733"
-    private lazy var devEmail = "support_stocks@gmail.com"
+    private var tempErrorText = "" // stores error text for report
+    private var symbol: String? // symbol for data request
+    private let token = "sk_2300dc06c77a4de5a7b9b4301594f733" // token to access API data
+    private let devEmail = "o.n.eremenko@gmail.com" // draft support email
     
-// MARK: Companies for UIPickerView
+    // MARK: Companies for UIPickerView
     
     private var companiesArray: [Company]?
     
-// MARK: Data for selected company
+    // MARK: Data for the selected company
     
     private var quoteData: Quote?
     private var imageData: ImageData?
 
-// MARK: Request stocks data and image
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        companyPickerView.dataSource = self
+        companyPickerView.delegate = self
+        
+        activityIndicator.hidesWhenStopped = true
+        
+        requestData(dataType: .companies)
+    }
+    
+    // MARK: Request data
     
     private func requestData(dataType: DataType) {
         var stringURL = ""
-        var jsonType: JsonType
+        var actionType: ActionType
         var errorType: ErrorType
         switch dataType {
         case .companies:
             stringURL = "https://cloud.iexapis.com/stable/stock/market/list/mostactive?token=\(token)"
-            jsonType = .parseCompanies
-            errorType = .companies
+            actionType = .parseCompanies
+            errorType = .noCompanies
         case .quote:
             guard let symbol = symbol else { return }
             stringURL = "https://cloud.iexapis.com/stable/stock/\(symbol)/quote?token=\(token)"
-            jsonType = .parseQuote
-            errorType = .stocksData
+            actionType = .parseQuote
+            errorType = .noQuote
         case .logo:
             guard let symbol = symbol else { return }
             stringURL = "https://cloud.iexapis.com/stable/stock/\(symbol)/logo?token=\(token)"
-            jsonType = .parseLogo
-            errorType = .companyLogo
+            actionType = .parseLogo
+            errorType = .noLogo
         }
         
         guard let url = URL(string: stringURL) else { return }
         
         let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil {
-                switch jsonType {
+                switch actionType {
                 case .parseCompanies:
                     self.parseData(from: data, dataType: .companies)
                 case .parseQuote:
@@ -74,6 +88,8 @@ class ViewController: UIViewController {
         
         dataTask.resume()
     }
+
+    // MARK: Parse data
     
     private func parseData(from data: Data, dataType: DataType) {
         let jsonDecoder = JSONDecoder()
@@ -83,7 +99,7 @@ class ViewController: UIViewController {
             case .companies:
                 let dataFromJson = try jsonDecoder.decode([Company].self, from: data)
                 companiesArray = dataFromJson
-                guard companiesArray != nil else { return showALert(errorType: .companies) }
+                guard companiesArray != nil else { return }
                 DispatchQueue.main.async {
                     self.companyPickerView.reloadAllComponents()
                     self.requestQuoteUpdate()
@@ -91,22 +107,25 @@ class ViewController: UIViewController {
             case .quote:
                 let dataFromJson = try jsonDecoder.decode(Quote.self, from: data)
                 quoteData = dataFromJson
-                guard let quoteData = quoteData else { return showALert(errorType: .invalidData) }
+                guard let quoteData = quoteData else { return }
                 DispatchQueue.main.async { [weak self] in
                     self?.displayStockInfo(data: quoteData)
                 }
             case .logo:
                 let dataFromJson = try jsonDecoder.decode(ImageData.self, from: data)
                 imageData = dataFromJson
-                guard let imageData = imageData else { return showALert(errorType: .invalidData) }
+                guard let imageData = imageData else { return }
                 let imageURL = URL(string: imageData.url)
                 logoImageView.load(url: imageURL!)
             }
         } catch {
             print(error)
+            tempErrorText = "\(error)"
+            showALert(errorType: .invalidData)
         }
-
     }
+    
+    // MARK: Display parsed data on the screen
     
     private func displayStockInfo(data: Quote) {
         activityIndicator.stopAnimating()
@@ -115,15 +134,20 @@ class ViewController: UIViewController {
         priceLabel.text = "\(data.latestPrice)"
         priceChangeLabel.text = "\(data.change)"
         
+        // Change label text color depending on "change" value
+        
         if data.change > 0 {
-            priceChangeLabel.textColor = .green
+            priceChangeLabel.textColor = .systemGreen
         } else if data.change < 0 {
-            priceChangeLabel.textColor = .red
+            priceChangeLabel.textColor = .systemRed
         }
     }
+
+    // MARK: Update data on the screen
     
     private func requestQuoteUpdate() {
         activityIndicator.startAnimating()
+        
         companyNameLabel.numberOfLines = 2
         logoImageView.image = UIImage(named: "brand")
         logoImageView.backgroundColor = .white
@@ -137,6 +161,8 @@ class ViewController: UIViewController {
         requestData(dataType: .quote)
         requestData(dataType: .logo)
     }
+    
+    // Update labels text and text color
     
     private func updateLabels() {
         let labelArray = [companyNameLabel, companySymbolLabel, priceLabel, priceChangeLabel]
@@ -157,32 +183,30 @@ class ViewController: UIViewController {
     
     private func showALert(errorType: ErrorType){
         var titleText = ""
-        var messageText = ""
-        var solve: SolutionType
+        var messageText = "Check your internet connection, tap OK to reload"
+        var solution: SolutionType
         
         switch errorType {
-        case .companies:
+        case .noCompanies:
             titleText = "Companies list not loaded"
-            messageText = "Check your internet connection and tap OK to reload"
-            solve = .reloadCompanies
-        case .stocksData:
+            solution = .reloadCompanies
+        case .noQuote:
             titleText = "Company stocks data not loaded"
-            messageText = "Check your internet connection and tap OK to reload"
-            solve = .reloadStocksData
-        case .companyLogo:
-            titleText = "Company logo not loaded"
-            messageText = "Check your internet connection and tap OK to reload"
-            solve = .reloadLogo
+            solution = .reloadStocksData
+        case .noLogo:
+            titleText = "Company logo missing"
+            solution = .reloadLogo
         case .invalidData:
             titleText = "Invalid data"
             messageText = "Please report this issue"
-            solve = .report
+            solution = .report
         }
         
         DispatchQueue.main.async {
             let alert = UIAlertController(title: titleText, message: messageText, preferredStyle: .alert)
+            let ignoreAction = UIAlertAction(title: "Ignore", style: .cancel, handler: nil)
             let okAction = UIAlertAction(title: "OK", style: .default) { [weak self] action in
-                switch solve {
+                switch solution {
                 case .reloadCompanies:
                     self?.requestData(dataType: .companies)
                 case .reloadStocksData:
@@ -195,6 +219,7 @@ class ViewController: UIViewController {
                 }
             }
             alert.addAction(okAction)
+            alert.addAction(ignoreAction)
             
             self.present(alert, animated: true)
             self.activityIndicator.stopAnimating()
@@ -209,30 +234,16 @@ class ViewController: UIViewController {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
             mail.setToRecipients([devEmail])
-            mail.setMessageBody("<p> Invalid data error in Alert title </p>", isHTML: true)
+            mail.setMessageBody("<p> Error: \(tempErrorText) </p>", isHTML: true)
             mail.setSubject(subject)
             present(mail, animated: true)
         } else {
             print("error")
         }
     }
-    
-    // MARK: - Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        companyPickerView.dataSource = self
-        companyPickerView.delegate = self
-        
-        activityIndicator.hidesWhenStopped = true
-        
-        requestData(dataType: .companies)
-    }
-    
 }
 
-// MARK: - UIPickerViewDataSource
+    // MARK: - UIPickerViewDataSource
 
 extension ViewController: UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -244,7 +255,7 @@ extension ViewController: UIPickerViewDataSource {
     }
 }
 
-// MARK: - UIPickerViewDelegate
+    // MARK: - UIPickerViewDelegate
 
 extension ViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
@@ -256,7 +267,7 @@ extension ViewController: UIPickerViewDelegate {
     }
 }
 
-// MARK: - MessageUI
+    // MARK: - MFMailComposeViewControllerDelegate
 
 extension ViewController: MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {

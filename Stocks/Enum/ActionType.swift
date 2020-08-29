@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum JsonType {
+enum ActionType {
     case parseCompanies
     case parseQuote
     case parseLogo

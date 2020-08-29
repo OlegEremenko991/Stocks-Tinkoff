@@ -108,42 +108,6 @@ class ViewController: UIViewController {
 
     }
     
-//    private func parseQuote(from data: Data) {
-//        do {
-//            let jsonObject = try JSONSerialization.jsonObject(with: data)
-//
-//            guard
-//                let json = jsonObject as? [String: Any],
-//                let companyName = json["companyName"] as? String,
-//                let companySymbol = json["symbol"] as? String,
-//                let price = json["latestPrice"] as? Double,
-//                let priceChange = json["change"] as? Double else {
-//                    print("Invalid JSON")
-//                    return showALert(errorType: .invalidData)
-//            }
-//
-//            DispatchQueue.main.async { [weak self] in
-//                self?.displayStockInfo(companyName: companyName, companySymbol: companySymbol, price: price, priceChange: priceChange)
-//            }
-//        } catch  {
-//            print("JSON parsing error: " + error.localizedDescription)
-//        }
-//    }
-    
-
-//    private func displayStockInfo(companyName: String, companySymbol: String, price: Double, priceChange: Double) {
-//        activityIndicator.stopAnimating()
-//        companyNameLabel.text = companyName
-//        companySymbolLabel.text = companySymbol
-//        priceLabel.text = "\(price)"
-//        priceChangeLabel.text = "\(priceChange)"
-//        if priceChange > 0 {
-//            priceChangeLabel.textColor = .green
-//        } else if priceChange < 0 {
-//            priceChangeLabel.textColor = .red
-//        }
-//    }
-    
     private func displayStockInfo(data: Quote) {
         activityIndicator.stopAnimating()
         companyNameLabel.text = data.companyName

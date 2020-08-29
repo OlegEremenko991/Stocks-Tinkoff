@@ -8,9 +8,10 @@
 
 import UIKit
 
-// MARK: Load image from URL
-
 extension UIImageView {
+    
+    // Load image from URL
+    
     func load(url: URL) {
         DispatchQueue.main.async { [weak self] in
             if let data = try? Data(contentsOf: url) {
@@ -19,5 +20,13 @@ extension UIImageView {
                 }
             }
         }
+    }
+    
+    // Set up default image and properties
+    
+    func defaultSetup() {
+        self.image = UIImage(named: "brand")
+        self.backgroundColor = .white
+        self.layer.cornerRadius = 10
     }
 }

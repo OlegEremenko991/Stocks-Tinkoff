@@ -10,6 +10,7 @@ import UIKit
 import MessageUI
 
 class ViewController: UIViewController {
+    @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var companyNameLabel: UILabel!
     @IBOutlet weak var companyPickerView: UIPickerView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -31,7 +32,7 @@ class ViewController: UIViewController {
     
     private var quoteData: Quote?
     private var imageData: ImageData?
-
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -44,8 +45,7 @@ class ViewController: UIViewController {
         
         requestData(dataType: .companies)
     }
-    
-    // MARK: Request data
+    // MARK: - Request data
     
     private func requestData(dataType: DataType) {
         var stringURL = ""
@@ -88,8 +88,7 @@ class ViewController: UIViewController {
         
         dataTask.resume()
     }
-
-    // MARK: Parse data
+    // MARK: - Parse data
     
     private func parseData(from data: Data, dataType: DataType) {
         let jsonDecoder = JSONDecoder()
@@ -100,9 +99,10 @@ class ViewController: UIViewController {
                 let dataFromJson = try jsonDecoder.decode([Company].self, from: data)
                 companiesArray = dataFromJson
                 guard companiesArray != nil else { return }
-                DispatchQueue.main.async {
-                    self.companyPickerView.reloadAllComponents()
-                    self.requestQuoteUpdate()
+                companiesArray = companiesArray?.sorted(by: { $0.companyName < $1.companyName }) // sort companies by name
+                DispatchQueue.main.async { [weak self] in
+                    self?.companyPickerView.reloadAllComponents()
+                    self?.requestQuoteUpdate()
                 }
             case .quote:
                 let dataFromJson = try jsonDecoder.decode(Quote.self, from: data)
@@ -124,8 +124,7 @@ class ViewController: UIViewController {
             showALert(errorType: .invalidData)
         }
     }
-    
-    // MARK: Display parsed data on the screen
+    // MARK: - Display parsed data on the screen
     
     private func displayStockInfo(data: Quote) {
         activityIndicator.stopAnimating()
@@ -135,7 +134,6 @@ class ViewController: UIViewController {
         priceChangeLabel.text = "\(data.change)"
         
         // Change label text color depending on "change" value
-        
         if data.change > 0 {
             priceChangeLabel.textColor = .systemGreen
         } else if data.change < 0 {
@@ -143,15 +141,12 @@ class ViewController: UIViewController {
         }
     }
 
-    // MARK: Update data on the screen
+    // MARK: Update quote data on the screen
     
     private func requestQuoteUpdate() {
         activityIndicator.startAnimating()
-        
         companyNameLabel.numberOfLines = 2
-        logoImageView.image = UIImage(named: "brand")
-        logoImageView.backgroundColor = .white
-        logoImageView.layer.cornerRadius = 10
+        logoImageView.defaultSetup() // setup default image and properties
         
         updateLabels()
         
@@ -167,13 +162,13 @@ class ViewController: UIViewController {
     private func updateLabels() {
         let labelArray = [companyNameLabel, companySymbolLabel, priceLabel, priceChangeLabel]
         for x in labelArray {
-            x?.text = "..."
+            x?.text = "-"
             x?.textColor = UIColor { tc in
                 switch tc.userInterfaceStyle {
                 case .dark:
-                    return UIColor.white
+                    return .white
                 default:
-                    return UIColor.black
+                    return .black
                 }
             }
         }
@@ -188,13 +183,13 @@ class ViewController: UIViewController {
         
         switch errorType {
         case .noCompanies:
-            titleText = "Companies list not loaded"
+            titleText = "List of companies is not available"
             solution = .reloadCompanies
         case .noQuote:
-            titleText = "Company stocks data not loaded"
+            titleText = "Company quotes missing"
             solution = .reloadStocksData
         case .noLogo:
-            titleText = "Company logo missing"
+            titleText = "Company logo is not available"
             solution = .reloadLogo
         case .invalidData:
             titleText = "Invalid data"
@@ -224,10 +219,8 @@ class ViewController: UIViewController {
             self.present(alert, animated: true)
             self.activityIndicator.stopAnimating()
         }
-
     }
-    
-    // MARK: - Report a bug Email
+    // MARK: - Report an issue
     
     private func sendEmail(subject: String) {
         if MFMailComposeViewController.canSendMail() {
@@ -242,7 +235,6 @@ class ViewController: UIViewController {
         }
     }
 }
-
     // MARK: - UIPickerViewDataSource
 
 extension ViewController: UIPickerViewDataSource {
@@ -253,8 +245,16 @@ extension ViewController: UIPickerViewDataSource {
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return companiesArray?.count ?? 1
     }
+    
+    // Customize label inside picker view
+    
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        let label = UILabel()
+        label.text = companiesArray?[row].companyName
+        label.sizeToFit()
+        return label
+    }
 }
-
     // MARK: - UIPickerViewDelegate
 
 extension ViewController: UIPickerViewDelegate {
@@ -266,7 +266,6 @@ extension ViewController: UIPickerViewDelegate {
         requestQuoteUpdate()
     }
 }
-
     // MARK: - MFMailComposeViewControllerDelegate
 
 extension ViewController: MFMailComposeViewControllerDelegate {

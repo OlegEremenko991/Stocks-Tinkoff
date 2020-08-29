@@ -10,6 +10,7 @@ import UIKit
 import MessageUI
 
 class ViewController: UIViewController {
+    @IBOutlet weak var reloadButton: UIButton!
     @IBOutlet weak var companyNameLabel: UILabel!
     @IBOutlet weak var companyPickerView: UIPickerView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -43,6 +44,7 @@ class ViewController: UIViewController {
         
         activityIndicator.hidesWhenStopped = true
         hintLabel.isHidden = true
+        reloadButton.isHidden = true
         
         requestData(dataType: .companies)
     }
@@ -98,11 +100,7 @@ class ViewController: UIViewController {
             case .companies:
                 let dataFromJson = try jsonDecoder.decode([Company].self, from: data)
                 companiesArray = dataFromJson
-                guard companiesArray != nil else {
-                    return DispatchQueue.main.async { [weak self] in
-                        self?.hintLabel.isHidden = false
-                    }
-                }
+                guard companiesArray != nil else { return }
                 companiesArray = companiesArray?.sorted(by: { $0.companyName < $1.companyName }) // sort companies by name
                 DispatchQueue.main.async { [weak self] in
                     self?.companyPickerView.reloadAllComponents()
@@ -154,6 +152,7 @@ class ViewController: UIViewController {
         
         updateLabels()
         hintLabel.isHidden = false
+        reloadButton.isHidden = true
         
         let selectedRow = companyPickerView.selectedRow(inComponent: 0)
         symbol = companiesArray?[selectedRow].symbol
@@ -182,7 +181,7 @@ class ViewController: UIViewController {
     
     private func showALert(errorType: ErrorType){
         var titleText = ""
-        var messageText = "Check your internet connection, tap OK to reload"
+        var messageText = "Check your internet connection"
         var solution: SolutionType
         
         switch errorType {
@@ -203,8 +202,12 @@ class ViewController: UIViewController {
         
         DispatchQueue.main.async {
             let alert = UIAlertController(title: titleText, message: messageText, preferredStyle: .alert)
-            let ignoreAction = UIAlertAction(title: "Ignore", style: .cancel, handler: nil)
-            let okAction = UIAlertAction(title: "OK", style: .default) { [weak self] action in
+            let ignoreAction = UIAlertAction(title: "Ignore", style: .destructive) { [weak self] action in
+                DispatchQueue.main.async {
+                    self?.reloadButton.isHidden = false
+                }
+            }
+            let okAction = UIAlertAction(title: "Reload", style: .default) { [weak self] action in
                 switch solution {
                 case .reloadCompanies:
                     self?.requestData(dataType: .companies)
@@ -239,6 +242,11 @@ class ViewController: UIViewController {
             print("error")
         }
     }
+    
+    @IBAction func reloadButtonTapped(_ sender: UIButton) {
+        requestData(dataType: .companies)
+    }
+    
 }
     // MARK: - UIPickerViewDataSource
 

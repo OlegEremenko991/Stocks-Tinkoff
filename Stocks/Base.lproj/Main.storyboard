@@ -91,6 +91,18 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hfI-3m-7M1">
+                                <rect key="frame" x="192" y="382.5" width="30" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="IU2-aG-QBi"/>
+                                    <constraint firstAttribute="height" constant="30" id="VME-pU-lxM"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <state key="normal" image="arrow.2.circlepath" catalog="system"/>
+                                <connections>
+                                    <action selector="reloadButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="PKQ-0D-12y"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
@@ -105,10 +117,12 @@
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="X6K-NW-pfA" secondAttribute="trailing" constant="30" id="GpX-Ow-fyc"/>
                             <constraint firstItem="wjL-ND-aQI" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="30" id="ISa-a9-ykl"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="dr7-Nz-inI" secondAttribute="trailing" constant="30" id="IXT-TP-ShX"/>
+                            <constraint firstItem="dkg-R7-M0g" firstAttribute="top" secondItem="hfI-3m-7M1" secondAttribute="bottom" constant="20" id="KHC-4Q-zNe"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Caa-Tm-5f0" secondAttribute="trailing" constant="30" id="LEv-GT-5KA"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="F7A-R0-YKs" secondAttribute="trailing" constant="30" id="Pvb-pY-fHO"/>
                             <constraint firstItem="dr7-Nz-inI" firstAttribute="centerY" secondItem="her-WK-FBm" secondAttribute="centerY" id="RZz-7Z-d8P"/>
                             <constraint firstItem="j5f-IQ-pqS" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="RyH-i3-2ts"/>
+                            <constraint firstItem="hfI-3m-7M1" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="SEd-B0-Cay"/>
                             <constraint firstItem="her-WK-FBm" firstAttribute="top" secondItem="HIn-mQ-qJK" secondAttribute="bottom" constant="30" id="Tv0-ja-pNA"/>
                             <constraint firstItem="TVI-Cb-1Yi" firstAttribute="top" secondItem="j5f-IQ-pqS" secondAttribute="bottom" id="U7p-eM-s8c"/>
                             <constraint firstItem="X6K-NW-pfA" firstAttribute="top" secondItem="nie-M5-TQz" secondAttribute="bottom" constant="30" id="W7d-f2-K6c"/>
@@ -140,6 +154,7 @@
                         <outlet property="logoImageView" destination="Idr-ws-dAv" id="5Xu-Rp-eWS"/>
                         <outlet property="priceChangeLabel" destination="F7A-R0-YKs" id="MXE-7D-vNa"/>
                         <outlet property="priceLabel" destination="dr7-Nz-inI" id="XiH-sb-dk0"/>
+                        <outlet property="reloadButton" destination="hfI-3m-7M1" id="Ef3-Hd-HBv"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -147,4 +162,7 @@
             <point key="canvasLocation" x="1044.9275362318842" y="116.51785714285714"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="arrow.2.circlepath" catalog="system" width="128" height="101"/>
+    </resources>
 </document>

@@ -10,7 +10,6 @@ import UIKit
 import MessageUI
 
 class ViewController: UIViewController {
-    @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var companyNameLabel: UILabel!
     @IBOutlet weak var companyPickerView: UIPickerView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -18,11 +17,12 @@ class ViewController: UIViewController {
     @IBOutlet weak var priceLabel: UILabel!
     @IBOutlet weak var priceChangeLabel: UILabel!
     @IBOutlet weak var logoImageView: UIImageView!
+    @IBOutlet weak var hintLabel: UILabel!
     
     private var tempErrorText = "" // stores error text for report
     private var symbol: String? // symbol for data request
     private let token = "sk_2300dc06c77a4de5a7b9b4301594f733" // token to access API data
-    private let devEmail = "o.n.eremenko@gmail.com" // draft support email
+    private let devEmail = "o.n.eremenko@gmail.com" // support email
     
     // MARK: Companies for UIPickerView
     
@@ -42,6 +42,7 @@ class ViewController: UIViewController {
         companyPickerView.delegate = self
         
         activityIndicator.hidesWhenStopped = true
+        hintLabel.isHidden = true
         
         requestData(dataType: .companies)
     }
@@ -92,13 +93,16 @@ class ViewController: UIViewController {
     
     private func parseData(from data: Data, dataType: DataType) {
         let jsonDecoder = JSONDecoder()
-        
         do {
             switch dataType {
             case .companies:
                 let dataFromJson = try jsonDecoder.decode([Company].self, from: data)
                 companiesArray = dataFromJson
-                guard companiesArray != nil else { return }
+                guard companiesArray != nil else {
+                    return DispatchQueue.main.async { [weak self] in
+                        self?.hintLabel.isHidden = false
+                    }
+                }
                 companiesArray = companiesArray?.sorted(by: { $0.companyName < $1.companyName }) // sort companies by name
                 DispatchQueue.main.async { [weak self] in
                     self?.companyPickerView.reloadAllComponents()
@@ -128,6 +132,7 @@ class ViewController: UIViewController {
     
     private func displayStockInfo(data: Quote) {
         activityIndicator.stopAnimating()
+
         companyNameLabel.text = data.companyName
         companySymbolLabel.text = data.symbol
         priceLabel.text = "\(data.latestPrice)"
@@ -140,8 +145,7 @@ class ViewController: UIViewController {
             priceChangeLabel.textColor = .systemRed
         }
     }
-
-    // MARK: Update quote data on the screen
+    // MARK: - Request full update
     
     private func requestQuoteUpdate() {
         activityIndicator.startAnimating()
@@ -149,6 +153,7 @@ class ViewController: UIViewController {
         logoImageView.defaultSetup() // setup default image and properties
         
         updateLabels()
+        hintLabel.isHidden = false
         
         let selectedRow = companyPickerView.selectedRow(inComponent: 0)
         symbol = companiesArray?[selectedRow].symbol
@@ -173,7 +178,6 @@ class ViewController: UIViewController {
             }
         }
     }
-    
     // MARK: - ALert
     
     private func showALert(errorType: ErrorType){
@@ -206,11 +210,12 @@ class ViewController: UIViewController {
                     self?.requestData(dataType: .companies)
                 case .reloadStocksData:
                     self?.requestData(dataType: .quote)
+                    self?.requestData(dataType: .logo)
                 case .reloadLogo:
                     self?.requestData(dataType: .logo)
                 case .report:
                     let subject = "Report a problem in app"
-                    self?.sendEmail(subject: subject)
+                    self?.sendEmail(with: subject)
                 }
             }
             alert.addAction(okAction)
@@ -222,7 +227,7 @@ class ViewController: UIViewController {
     }
     // MARK: - Report an issue
     
-    private func sendEmail(subject: String) {
+    private func sendEmail(with subject: String) {
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self

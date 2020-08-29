@@ -10,7 +10,29 @@ import UIKit
 import MessageUI
 
 enum ErrorType {
-    case companies, companyData, companyLogo
+    case companies
+    case stocksData
+    case companyLogo
+    case invalidData
+}
+
+enum SolutionType {
+    case reloadCompanies
+    case reloadStocksData
+    case reloadLogo
+    case report
+}
+
+enum DataType {
+    case companies
+    case quote
+    case logo
+}
+
+enum JsonType {
+    case parseCompanies
+    case parseQuote
+    case parseLogo
 }
 
 class ViewController: UIViewController {
@@ -22,6 +44,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var priceChangeLabel: UILabel!
     @IBOutlet weak var logoImageView: UIImageView!
     
+    private var symbol: String?
+    private let token = "sk_2300dc06c77a4de5a7b9b4301594f733"
     private lazy var devEmail = "support_stocks@gmail.com"
     
 // MARK: Companies for UIPickerView
@@ -30,52 +54,46 @@ class ViewController: UIViewController {
 
 // MARK: Request stocks data and image
     
-    private func requestQuote(for symbol: String) {
-        let token = "sk_2300dc06c77a4de5a7b9b4301594f733"
-        
-        guard let url1 = URL(string: "https://cloud.iexapis.com/stable/stock/\(symbol)/quote?token=\(token)"),
-            let url2 = URL(string: "https://cloud.iexapis.com/stable/stock/\(symbol)/logo?token=\(token)") else {
-            return
+    private func requestData(dataType: DataType) {
+        var stringURL = ""
+        var jsonType: JsonType
+        var errorType: ErrorType
+        switch dataType {
+        case .companies:
+            stringURL = "https://cloud.iexapis.com/stable/stock/market/list/mostactive?token=\(token)"
+            jsonType = .parseCompanies
+            errorType = .companies
+        case .quote:
+            guard let symbol = symbol else { return }
+            stringURL = "https://cloud.iexapis.com/stable/stock/\(symbol)/quote?token=\(token)"
+            jsonType = .parseQuote
+            errorType = .stocksData
+        case .logo:
+            guard let symbol = symbol else { return }
+            stringURL = "https://cloud.iexapis.com/stable/stock/\(symbol)/logo?token=\(token)"
+            jsonType = .parseLogo
+            errorType = .companyLogo
         }
         
-        let dataTask1 = URLSession.shared.dataTask(with: url1) { (data, response, error) in
-            if let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil {
-                self.parseQuote(from: data)
-            } else {
-                self.showALert(title: "Network error", message: "Check your internet connection and tap OK to reload company data")
-                print("Network error! Could not get quote data")
-            }
-        }
-        
-        dataTask1.resume()
-        
-        let dataTask2 = URLSession.shared.dataTask(with: url2) { (data, response, error) in
-            if let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil {
-                self.parseImage(from: data)
-            } else {
-                print("Network error! Could not get image URL")
-            }
-        }
-        
-        dataTask2.resume()
-    }
-    
-    private func requestCompanies() {
-        let token = "sk_2300dc06c77a4de5a7b9b4301594f733"
-        guard let url = URL(string: "https://cloud.iexapis.com/stable/stock/market/list/mostactive?token=\(token)") else { return }
+        guard let url = URL(string: stringURL) else { return }
         
         let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil {
-                self.parseCompanies(from: data)
+                switch jsonType {
+                case .parseCompanies:
+                    self.parseCompanies(from: data)
+                case .parseQuote:
+                    self.parseQuote(from: data)
+                case .parseLogo:
+                    self.parseLogo(from: data)
+                }
             } else {
-                self.showALert(title: "Network error", message: "Check your internet connection and tap OK to reload companies")
-                print("Network error! Could not get companies data")
+                self.showALert(errorType: errorType)
+                print("Network error!")
             }
         }
         
         dataTask.resume()
-        
-        return
     }
     
     private func parseCompanies(from data: Data) {
@@ -90,9 +108,6 @@ class ViewController: UIViewController {
     }
     
     private func parseQuote(from data: Data) {
-        let jsonErrorTitle = "Invalid data"
-        let jsonErrorMessage = "Tap OK to send a bug report"
-        
         do {
             let jsonObject = try JSONSerialization.jsonObject(with: data)
             
@@ -103,7 +118,7 @@ class ViewController: UIViewController {
                 let price = json["latestPrice"] as? Double,
                 let priceChange = json["change"] as? Double else {
                     print("Invalid JSON")
-                    return showALert(title: jsonErrorTitle, message: jsonErrorMessage)
+                    return showALert(errorType: .invalidData)
             }
             
             DispatchQueue.main.async { [weak self] in
@@ -114,10 +129,7 @@ class ViewController: UIViewController {
         }
     }
     
-    private func parseImage(from data: Data) {
-        let jsonErrorTitle = "Invalid data"
-        let jsonErrorMessage = "Tap OK to send a bug report"
-        
+    private func parseLogo(from data: Data) {
         do {
             let jsonObject = try JSONSerialization.jsonObject(with: data)
             
@@ -126,7 +138,7 @@ class ViewController: UIViewController {
                 let stringURL = json["url"] as? String,
                 let imageURL = URL(string: stringURL) else {
                     print("Invalid JSON")
-                    return showALert(title: jsonErrorTitle, message: jsonErrorMessage)
+                    return showALert(errorType: .invalidData)
             }
                 logoImageView.load(url: imageURL)
         } catch  {
@@ -149,6 +161,11 @@ class ViewController: UIViewController {
     
     private func requestQuoteUpdate() {
         activityIndicator.startAnimating()
+        companyNameLabel.numberOfLines = 2
+        logoImageView.image = UIImage(named: "brand")
+        logoImageView.backgroundColor = .white
+        logoImageView.layer.cornerRadius = 10
+        
         let labelArray = [companyNameLabel, companySymbolLabel, priceLabel, priceChangeLabel]
         for x in labelArray {
             x?.text = "..."
@@ -162,27 +179,52 @@ class ViewController: UIViewController {
             }
         }
         
-        companyNameLabel.numberOfLines = 2
-        logoImageView.image = UIImage(named: "brand")
-        logoImageView.backgroundColor = .white
-        logoImageView.layer.cornerRadius = 10
-        
         let selectedRow = companyPickerView.selectedRow(inComponent: 0)
-        let selectedSymbol = companiesArray[selectedRow].symbol
-        requestQuote(for: selectedSymbol)
+        symbol = companiesArray[selectedRow].symbol
+
+        requestData(dataType: .quote)
+        requestData(dataType: .logo)
     }
     
     // MARK: - ALert
     
-    private func showALert(title: String, message: String){
+    private func showALert(errorType: ErrorType){
+        var titleText = ""
+        var messageText = ""
+        var solve: SolutionType
+        
+        switch errorType {
+        case .companies:
+            titleText = "Companies list not loaded"
+            messageText = "Check your internet connection and tap OK to reload"
+            solve = .reloadCompanies
+        case .stocksData:
+            titleText = "Company stocks data not loaded"
+            messageText = "Check your internet connection and tap OK to reload"
+            solve = .reloadStocksData
+        case .companyLogo:
+            titleText = "Company logo not loaded"
+            messageText = "Check your internet connection and tap OK to reload"
+            solve = .reloadLogo
+        case .invalidData:
+            titleText = "Invalid data"
+            messageText = "Please report this issue"
+            solve = .report
+        }
+        
         DispatchQueue.main.async {
-            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            let alert = UIAlertController(title: titleText, message: messageText, preferredStyle: .alert)
             let okAction = UIAlertAction(title: "OK", style: .default) { [weak self] action in
-                if title != "Network error" {
+                switch solve {
+                case .reloadCompanies:
+                    self?.requestData(dataType: .companies)
+                case .reloadStocksData:
+                    self?.requestData(dataType: .quote)
+                case .reloadLogo:
+                    self?.requestData(dataType: .logo)
+                case .report:
                     let subject = "Report a problem in app"
                     self?.sendEmail(subject: subject)
-                } else {
-                    self?.requestQuoteUpdate()
                 }
             }
             alert.addAction(okAction)
@@ -218,7 +260,7 @@ class ViewController: UIViewController {
         
         activityIndicator.hidesWhenStopped = true
         
-        requestCompanies()
+        requestData(dataType: .companies)
     }
     
 }
@@ -256,7 +298,7 @@ extension ViewController: MFMailComposeViewControllerDelegate {
     }
 }
 
-// MARK: - Load image extension
+// MARK: - Load image
 
 extension UIImageView {
     func load(url: URL) {

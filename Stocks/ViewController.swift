@@ -9,32 +9,6 @@
 import UIKit
 import MessageUI
 
-enum ErrorType {
-    case companies
-    case stocksData
-    case companyLogo
-    case invalidData
-}
-
-enum SolutionType {
-    case reloadCompanies
-    case reloadStocksData
-    case reloadLogo
-    case report
-}
-
-enum DataType {
-    case companies
-    case quote
-    case logo
-}
-
-enum JsonType {
-    case parseCompanies
-    case parseQuote
-    case parseLogo
-}
-
 class ViewController: UIViewController {
     @IBOutlet weak var companyNameLabel: UILabel!
     @IBOutlet weak var companyPickerView: UIPickerView!
@@ -50,7 +24,12 @@ class ViewController: UIViewController {
     
 // MARK: Companies for UIPickerView
     
-    private var companiesArray = [Company]()
+    private var companiesArray: [Company]?
+    
+// MARK: Data for selected company
+    
+    private var quoteData: Quote?
+    private var imageData: ImageData?
 
 // MARK: Request stocks data and image
     
@@ -81,11 +60,11 @@ class ViewController: UIViewController {
             if let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil {
                 switch jsonType {
                 case .parseCompanies:
-                    self.parseCompanies(from: data)
+                    self.parseData(from: data, dataType: .companies)
                 case .parseQuote:
-                    self.parseQuote(from: data)
+                    self.parseData(from: data, dataType: .quote)
                 case .parseLogo:
-                    self.parseLogo(from: data)
+                    self.parseData(from: data, dataType: .logo)
                 }
             } else {
                 self.showALert(errorType: errorType)
@@ -96,65 +75,85 @@ class ViewController: UIViewController {
         dataTask.resume()
     }
     
-    private func parseCompanies(from data: Data) {
-        let jsonData = try? JSONDecoder().decode([Company].self, from: data)
-        guard let companiesData = jsonData else { return }
-        companiesArray = companiesData
-        DispatchQueue.main.async {
-            self.companyPickerView.reloadAllComponents()
-            self.requestQuoteUpdate()
-        }
+    private func parseData(from data: Data, dataType: DataType) {
+        let jsonDecoder = JSONDecoder()
         
-    }
-    
-    private func parseQuote(from data: Data) {
         do {
-            let jsonObject = try JSONSerialization.jsonObject(with: data)
-            
-            guard
-                let json = jsonObject as? [String: Any],
-                let companyName = json["companyName"] as? String,
-                let companySymbol = json["symbol"] as? String,
-                let price = json["latestPrice"] as? Double,
-                let priceChange = json["change"] as? Double else {
-                    print("Invalid JSON")
-                    return showALert(errorType: .invalidData)
+            switch dataType {
+            case .companies:
+                let dataFromJson = try jsonDecoder.decode([Company].self, from: data)
+                companiesArray = dataFromJson
+                guard companiesArray != nil else { return showALert(errorType: .companies) }
+                DispatchQueue.main.async {
+                    self.companyPickerView.reloadAllComponents()
+                    self.requestQuoteUpdate()
+                }
+            case .quote:
+                let dataFromJson = try jsonDecoder.decode(Quote.self, from: data)
+                quoteData = dataFromJson
+                guard let quoteData = quoteData else { return showALert(errorType: .invalidData) }
+                DispatchQueue.main.async { [weak self] in
+                    self?.displayStockInfo(data: quoteData)
+                }
+            case .logo:
+                let dataFromJson = try jsonDecoder.decode(ImageData.self, from: data)
+                imageData = dataFromJson
+                guard let imageData = imageData else { return showALert(errorType: .invalidData) }
+                let imageURL = URL(string: imageData.url)
+                logoImageView.load(url: imageURL!)
             }
-            
-            DispatchQueue.main.async { [weak self] in
-                self?.displayStockInfo(companyName: companyName, companySymbol: companySymbol, price: price, priceChange: priceChange)
-            }
-        } catch  {
-            print("JSON parsing error: " + error.localizedDescription)
+        } catch {
+            print(error)
         }
+
     }
     
-    private func parseLogo(from data: Data) {
-        do {
-            let jsonObject = try JSONSerialization.jsonObject(with: data)
-            
-            guard
-                let json = jsonObject as? [String: Any],
-                let stringURL = json["url"] as? String,
-                let imageURL = URL(string: stringURL) else {
-                    print("Invalid JSON")
-                    return showALert(errorType: .invalidData)
-            }
-                logoImageView.load(url: imageURL)
-        } catch  {
-            print("JSON parsing error: " + error.localizedDescription)
-        }
-    }
+//    private func parseQuote(from data: Data) {
+//        do {
+//            let jsonObject = try JSONSerialization.jsonObject(with: data)
+//
+//            guard
+//                let json = jsonObject as? [String: Any],
+//                let companyName = json["companyName"] as? String,
+//                let companySymbol = json["symbol"] as? String,
+//                let price = json["latestPrice"] as? Double,
+//                let priceChange = json["change"] as? Double else {
+//                    print("Invalid JSON")
+//                    return showALert(errorType: .invalidData)
+//            }
+//
+//            DispatchQueue.main.async { [weak self] in
+//                self?.displayStockInfo(companyName: companyName, companySymbol: companySymbol, price: price, priceChange: priceChange)
+//            }
+//        } catch  {
+//            print("JSON parsing error: " + error.localizedDescription)
+//        }
+//    }
     
-    private func displayStockInfo(companyName: String, companySymbol: String, price: Double, priceChange: Double) {
+
+//    private func displayStockInfo(companyName: String, companySymbol: String, price: Double, priceChange: Double) {
+//        activityIndicator.stopAnimating()
+//        companyNameLabel.text = companyName
+//        companySymbolLabel.text = companySymbol
+//        priceLabel.text = "\(price)"
+//        priceChangeLabel.text = "\(priceChange)"
+//        if priceChange > 0 {
+//            priceChangeLabel.textColor = .green
+//        } else if priceChange < 0 {
+//            priceChangeLabel.textColor = .red
+//        }
+//    }
+    
+    private func displayStockInfo(data: Quote) {
         activityIndicator.stopAnimating()
-        companyNameLabel.text = companyName
-        companySymbolLabel.text = companySymbol
-        priceLabel.text = "\(price)"
-        priceChangeLabel.text = "\(priceChange)"
-        if priceChange > 0 {
+        companyNameLabel.text = data.companyName
+        companySymbolLabel.text = data.symbol
+        priceLabel.text = "\(data.latestPrice)"
+        priceChangeLabel.text = "\(data.change)"
+        
+        if data.change > 0 {
             priceChangeLabel.textColor = .green
-        } else if priceChange < 0 {
+        } else if data.change < 0 {
             priceChangeLabel.textColor = .red
         }
     }
@@ -166,6 +165,16 @@ class ViewController: UIViewController {
         logoImageView.backgroundColor = .white
         logoImageView.layer.cornerRadius = 10
         
+        updateLabels()
+        
+        let selectedRow = companyPickerView.selectedRow(inComponent: 0)
+        symbol = companiesArray?[selectedRow].symbol
+
+        requestData(dataType: .quote)
+        requestData(dataType: .logo)
+    }
+    
+    private func updateLabels() {
         let labelArray = [companyNameLabel, companySymbolLabel, priceLabel, priceChangeLabel]
         for x in labelArray {
             x?.text = "..."
@@ -178,12 +187,6 @@ class ViewController: UIViewController {
                 }
             }
         }
-        
-        let selectedRow = companyPickerView.selectedRow(inComponent: 0)
-        symbol = companiesArray[selectedRow].symbol
-
-        requestData(dataType: .quote)
-        requestData(dataType: .logo)
     }
     
     // MARK: - ALert
@@ -273,7 +276,7 @@ extension ViewController: UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return companiesArray.count
+        return companiesArray?.count ?? 1
     }
 }
 
@@ -281,8 +284,7 @@ extension ViewController: UIPickerViewDataSource {
 
 extension ViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-//        return Array(companies.keys)[row]
-        return companiesArray[row].companyName
+        return companiesArray?[row].companyName
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
@@ -295,19 +297,5 @@ extension ViewController: UIPickerViewDelegate {
 extension ViewController: MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true)
-    }
-}
-
-// MARK: - Load image
-
-extension UIImageView {
-    func load(url: URL) {
-        DispatchQueue.main.async { [weak self] in
-            if let data = try? Data(contentsOf: url) {
-                if let image = UIImage(data: data) {
-                    self?.image = image
-                }
-            }
-        }
     }
 }

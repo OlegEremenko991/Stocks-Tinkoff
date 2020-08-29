@@ -16,6 +16,13 @@
 		6792711524F965E2005F5E0F /* ExtraVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792711424F965E2005F5E0F /* ExtraVC.swift */; };
 		6792711724F966CB005F5E0F /* TableViewCell1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792711624F966CB005F5E0F /* TableViewCell1.swift */; };
 		6792711B24FA3D66005F5E0F /* Company.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792711A24FA3D66005F5E0F /* Company.swift */; };
+		6792711D24FA63DA005F5E0F /* Quote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792711C24FA63DA005F5E0F /* Quote.swift */; };
+		6792711F24FA6515005F5E0F /* ImageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792711E24FA6515005F5E0F /* ImageData.swift */; };
+		6792712124FA692B005F5E0F /* ErrorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792712024FA692B005F5E0F /* ErrorType.swift */; };
+		6792712324FA6944005F5E0F /* SolutionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792712224FA6944005F5E0F /* SolutionType.swift */; };
+		6792712524FA6951005F5E0F /* DataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792712424FA6951005F5E0F /* DataType.swift */; };
+		6792712724FA695E005F5E0F /* JsonType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792712624FA695E005F5E0F /* JsonType.swift */; };
+		6792712924FA69F4005F5E0F /* UIImageView_Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792712824FA69F4005F5E0F /* UIImageView_Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +37,13 @@
 		6792711424F965E2005F5E0F /* ExtraVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraVC.swift; sourceTree = "<group>"; };
 		6792711624F966CB005F5E0F /* TableViewCell1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell1.swift; sourceTree = "<group>"; };
 		6792711A24FA3D66005F5E0F /* Company.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Company.swift; sourceTree = "<group>"; };
+		6792711C24FA63DA005F5E0F /* Quote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quote.swift; sourceTree = "<group>"; };
+		6792711E24FA6515005F5E0F /* ImageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageData.swift; sourceTree = "<group>"; };
+		6792712024FA692B005F5E0F /* ErrorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorType.swift; sourceTree = "<group>"; };
+		6792712224FA6944005F5E0F /* SolutionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolutionType.swift; sourceTree = "<group>"; };
+		6792712424FA6951005F5E0F /* DataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataType.swift; sourceTree = "<group>"; };
+		6792712624FA695E005F5E0F /* JsonType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonType.swift; sourceTree = "<group>"; };
+		6792712824FA69F4005F5E0F /* UIImageView_Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageView_Extension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,18 +76,57 @@
 		679270FF24F9314E005F5E0F /* Stocks */ = {
 			isa = PBXGroup;
 			children = (
+				6792712B24FA6A1E005F5E0F /* Model */,
+				6792712A24FA6A0E005F5E0F /* Enum */,
+				6792712C24FA6A31005F5E0F /* Support */,
+				6792712D24FA6A41005F5E0F /* Extra */,
+				6792710424F9314E005F5E0F /* ViewController.swift */,
 				6792710024F9314E005F5E0F /* AppDelegate.swift */,
 				6792710224F9314E005F5E0F /* SceneDelegate.swift */,
-				6792710424F9314E005F5E0F /* ViewController.swift */,
-				6792711A24FA3D66005F5E0F /* Company.swift */,
 				6792710624F9314E005F5E0F /* Main.storyboard */,
 				6792710924F93152005F5E0F /* Assets.xcassets */,
 				6792710B24F93152005F5E0F /* LaunchScreen.storyboard */,
 				6792710E24F93152005F5E0F /* Info.plist */,
+			);
+			path = Stocks;
+			sourceTree = "<group>";
+		};
+		6792712A24FA6A0E005F5E0F /* Enum */ = {
+			isa = PBXGroup;
+			children = (
+				6792712024FA692B005F5E0F /* ErrorType.swift */,
+				6792712224FA6944005F5E0F /* SolutionType.swift */,
+				6792712424FA6951005F5E0F /* DataType.swift */,
+				6792712624FA695E005F5E0F /* JsonType.swift */,
+			);
+			path = Enum;
+			sourceTree = "<group>";
+		};
+		6792712B24FA6A1E005F5E0F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				6792711A24FA3D66005F5E0F /* Company.swift */,
+				6792711C24FA63DA005F5E0F /* Quote.swift */,
+				6792711E24FA6515005F5E0F /* ImageData.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		6792712C24FA6A31005F5E0F /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				6792712824FA69F4005F5E0F /* UIImageView_Extension.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		6792712D24FA6A41005F5E0F /* Extra */ = {
+			isa = PBXGroup;
+			children = (
 				6792711424F965E2005F5E0F /* ExtraVC.swift */,
 				6792711624F966CB005F5E0F /* TableViewCell1.swift */,
 			);
-			path = Stocks;
+			path = Extra;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -148,11 +201,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				6792711724F966CB005F5E0F /* TableViewCell1.swift in Sources */,
+				6792712124FA692B005F5E0F /* ErrorType.swift in Sources */,
 				6792710524F9314E005F5E0F /* ViewController.swift in Sources */,
 				6792711524F965E2005F5E0F /* ExtraVC.swift in Sources */,
 				6792710124F9314E005F5E0F /* AppDelegate.swift in Sources */,
+				6792712724FA695E005F5E0F /* JsonType.swift in Sources */,
 				6792710324F9314E005F5E0F /* SceneDelegate.swift in Sources */,
+				6792712924FA69F4005F5E0F /* UIImageView_Extension.swift in Sources */,
+				6792712324FA6944005F5E0F /* SolutionType.swift in Sources */,
+				6792711D24FA63DA005F5E0F /* Quote.swift in Sources */,
 				6792711B24FA3D66005F5E0F /* Company.swift in Sources */,
+				6792712524FA6951005F5E0F /* DataType.swift in Sources */,
+				6792711F24FA6515005F5E0F /* ImageData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

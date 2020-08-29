@@ -15,6 +15,7 @@
 		6792710D24F93152005F5E0F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6792710B24F93152005F5E0F /* LaunchScreen.storyboard */; };
 		6792711524F965E2005F5E0F /* ExtraVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792711424F965E2005F5E0F /* ExtraVC.swift */; };
 		6792711724F966CB005F5E0F /* TableViewCell1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792711624F966CB005F5E0F /* TableViewCell1.swift */; };
+		6792711B24FA3D66005F5E0F /* Company.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6792711A24FA3D66005F5E0F /* Company.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		6792710E24F93152005F5E0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6792711424F965E2005F5E0F /* ExtraVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraVC.swift; sourceTree = "<group>"; };
 		6792711624F966CB005F5E0F /* TableViewCell1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell1.swift; sourceTree = "<group>"; };
+		6792711A24FA3D66005F5E0F /* Company.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Company.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				6792710024F9314E005F5E0F /* AppDelegate.swift */,
 				6792710224F9314E005F5E0F /* SceneDelegate.swift */,
 				6792710424F9314E005F5E0F /* ViewController.swift */,
+				6792711A24FA3D66005F5E0F /* Company.swift */,
 				6792710624F9314E005F5E0F /* Main.storyboard */,
 				6792710924F93152005F5E0F /* Assets.xcassets */,
 				6792710B24F93152005F5E0F /* LaunchScreen.storyboard */,
@@ -149,6 +152,7 @@
 				6792711524F965E2005F5E0F /* ExtraVC.swift in Sources */,
 				6792710124F9314E005F5E0F /* AppDelegate.swift in Sources */,
 				6792710324F9314E005F5E0F /* SceneDelegate.swift in Sources */,
+				6792711B24FA3D66005F5E0F /* Company.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

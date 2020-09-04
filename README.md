@@ -1,11 +1,11 @@
-# Stocks-Tinkoff
-Test task for Tinkoff
+# Stocks
+Test task made for Tinkoff. The app downloads all data through the Internet.
 
 ## What you can do with this app
 
-1. Scroll through a list of companies
-2. See stocks info for the selected company
-3. If there is no internet connection, you will get an alert
+1. Scroll through a list of companies.
+2. See stocks info for the selected company.
+3. If there is no Internet connection, you will get an alert.
 
 ## Screenshots and video
 

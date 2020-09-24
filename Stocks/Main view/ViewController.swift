@@ -25,13 +25,13 @@ final class ViewController: UIViewController {
     
 // MARK: Private properties
     
+    private let devEmail = "o.n.eremenko@gmail.com" // support email
     private var tempErrorText = "" // stores error text for report
+    
     private var symbol: String? // symbol for data request
     private let token = "sk_2300dc06c77a4de5a7b9b4301594f733" // token to access API data
-    private let devEmail = "o.n.eremenko@gmail.com" // support email
     
-    // Companies for UIPickerView
-    private var companiesArray: [Company]?
+    private var companiesArray: [Company]? // Companies for UIPickerView
     
     // Data for the selected company
     private var quoteData: Quote?

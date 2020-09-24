@@ -6,8 +6,6 @@
 //  Copyright © 2020 Oleg Eremenko. All rights reserved.
 //
 
-import Foundation
-
 enum ErrorType {
     case noCompanies
     case noQuote

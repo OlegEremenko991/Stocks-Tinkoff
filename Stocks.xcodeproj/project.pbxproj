@@ -53,6 +53,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		677455E4251CE0300088C291 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				6792710024F9314E005F5E0F /* AppDelegate.swift */,
+				6792710224F9314E005F5E0F /* SceneDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		677455E5251CE0380088C291 /* Storyboard */ = {
+			isa = PBXGroup;
+			children = (
+				6792710624F9314E005F5E0F /* Main.storyboard */,
+				6792710B24F93152005F5E0F /* LaunchScreen.storyboard */,
+			);
+			path = Storyboard;
+			sourceTree = "<group>";
+		};
+		677455E6251CE0510088C291 /* Main view */ = {
+			isa = PBXGroup;
+			children = (
+				6792710424F9314E005F5E0F /* ViewController.swift */,
+			);
+			path = "Main view";
+			sourceTree = "<group>";
+		};
 		679270F424F9314E005F5E0F = {
 			isa = PBXGroup;
 			children = (
@@ -72,15 +98,13 @@
 		679270FF24F9314E005F5E0F /* Stocks */ = {
 			isa = PBXGroup;
 			children = (
+				677455E4251CE0300088C291 /* App */,
+				677455E6251CE0510088C291 /* Main view */,
 				6792712B24FA6A1E005F5E0F /* Model */,
 				6792712A24FA6A0E005F5E0F /* Enum */,
 				6792712C24FA6A31005F5E0F /* Support */,
-				6792710424F9314E005F5E0F /* ViewController.swift */,
-				6792710024F9314E005F5E0F /* AppDelegate.swift */,
-				6792710224F9314E005F5E0F /* SceneDelegate.swift */,
-				6792710624F9314E005F5E0F /* Main.storyboard */,
+				677455E5251CE0380088C291 /* Storyboard */,
 				6792710924F93152005F5E0F /* Assets.xcassets */,
-				6792710B24F93152005F5E0F /* LaunchScreen.storyboard */,
 				6792710E24F93152005F5E0F /* Info.plist */,
 			);
 			path = Stocks;

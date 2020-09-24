@@ -9,7 +9,10 @@
 import UIKit
 import MessageUI
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
+    
+// MARK: IBOutlets
+    
     @IBOutlet weak var reloadButton: UIButton!
     @IBOutlet weak var companyNameLabel: UILabel!
     @IBOutlet weak var companyPickerView: UIPickerView!
@@ -20,35 +23,39 @@ class ViewController: UIViewController {
     @IBOutlet weak var logoImageView: UIImageView!
     @IBOutlet weak var hintLabel: UILabel!
     
+// MARK: Private properties
+    
     private var tempErrorText = "" // stores error text for report
     private var symbol: String? // symbol for data request
     private let token = "sk_2300dc06c77a4de5a7b9b4301594f733" // token to access API data
     private let devEmail = "o.n.eremenko@gmail.com" // support email
     
-    // MARK: Companies for UIPickerView
-    
+    // Companies for UIPickerView
     private var companiesArray: [Company]?
     
-    // MARK: Data for the selected company
-    
+    // Data for the selected company
     private var quoteData: Quote?
     private var imageData: ImageData?
     
-    // MARK: - Lifecycle
+// MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        setupView()
+        requestData(dataType: .companies)
+    }
+    
+// MARK: Private methods
+    
+    private func setupView() {
         companyPickerView.dataSource = self
         companyPickerView.delegate = self
         
         activityIndicator.hidesWhenStopped = true
+        
         hintLabel.isHidden = true
         reloadButton.isHidden = true
-        
-        requestData(dataType: .companies)
     }
-    // MARK: - Request data
     
     private func requestData(dataType: DataType) {
         var stringURL = ""
@@ -91,7 +98,6 @@ class ViewController: UIViewController {
         
         dataTask.resume()
     }
-    // MARK: - Parse data
     
     private func parseData(from data: Data, dataType: DataType) {
         let jsonDecoder = JSONDecoder()
@@ -126,8 +132,8 @@ class ViewController: UIViewController {
             showALert(errorType: .invalidData)
         }
     }
-    // MARK: - Display parsed data on the screen
     
+    // Display parsed data on the screen
     private func displayStockInfo(data: Quote) {
         activityIndicator.stopAnimating()
 
@@ -143,7 +149,6 @@ class ViewController: UIViewController {
             priceChangeLabel.textColor = .systemRed
         }
     }
-    // MARK: - Request full update
     
     private func requestQuoteUpdate() {
         activityIndicator.startAnimating()
@@ -162,7 +167,6 @@ class ViewController: UIViewController {
     }
     
     // Update labels text and text color
-    
     private func updateLabels() {
         let labelArray = [companyNameLabel, companySymbolLabel, priceLabel, priceChangeLabel]
         for x in labelArray {
@@ -177,7 +181,6 @@ class ViewController: UIViewController {
             }
         }
     }
-    // MARK: - ALert
     
     private func showALert(errorType: ErrorType){
         var titleText = ""
@@ -228,8 +231,8 @@ class ViewController: UIViewController {
             self.activityIndicator.stopAnimating()
         }
     }
-    // MARK: - Report an issue
     
+    // Report an issue
     private func sendEmail(with subject: String) {
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
@@ -243,12 +246,15 @@ class ViewController: UIViewController {
         }
     }
     
+// MARK: IBActions
+    
     @IBAction func reloadButtonTapped(_ sender: UIButton) {
         requestData(dataType: .companies)
     }
     
 }
-    // MARK: - UIPickerViewDataSource
+
+// MARK: UIPickerViewDataSource
 
 extension ViewController: UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -260,7 +266,6 @@ extension ViewController: UIPickerViewDataSource {
     }
     
     // Customize label inside picker view
-    
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         let label = UILabel()
         label.text = companiesArray?[row].companyName
@@ -268,7 +273,8 @@ extension ViewController: UIPickerViewDataSource {
         return label
     }
 }
-    // MARK: - UIPickerViewDelegate
+
+// MARK: UIPickerViewDelegate
 
 extension ViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
@@ -279,7 +285,8 @@ extension ViewController: UIPickerViewDelegate {
         requestQuoteUpdate()
     }
 }
-    // MARK: - MFMailComposeViewControllerDelegate
+
+// MARK: MFMailComposeViewControllerDelegate
 
 extension ViewController: MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {

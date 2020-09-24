@@ -6,8 +6,6 @@
 //  Copyright © 2020 Oleg Eremenko. All rights reserved.
 //
 
-import Foundation
-
 struct Company: Codable {
     var symbol: String
     var companyName: String

@@ -9,59 +9,24 @@
 import UIKit
 
 public final class NetworkService {
-
-    static func loadCompanies(token: String, completion: @escaping (Result<[Company], ErrorType>) -> ()) {
-        let defaultURL = "https://cloud.iexapis.com/stable/stock/"
-        var requestURL: URL?
-        var resultArray = [Company]()
-        
-        requestURL = RequestType.requestCompanies(defaultURL, token).url
-        
-        let task = URLSession.shared.dataTask(with: requestURL!) { (data, response, error) in
-            guard let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil else {
-                completion(.failure(.requestFailed))
-                return
-            }
-            do {
-                let dataFromJson = try JSONDecoder().decode([Company].self, from: data)
-                resultArray = dataFromJson
-                completion(.success(resultArray))
-            } catch {
-                completion(.failure(.companiesError))
-            }
-        }
-        task.resume()
-    }
     
-    static func loadQuote(token: String, symbol: String, completion: @escaping (Result<Quote, ErrorType>) -> ()) {
+    static func loadData<T: Decodable>(decodingType: T.Type, token: String, symbol: String? = nil, completion: @escaping (Result<T, ErrorType>) -> ()) {
         let defaultURL = "https://cloud.iexapis.com/stable/stock/"
         var requestURL: URL?
-        var result = Quote()
+        var resultData: T?
+        var errorType: ErrorType!
         
-        requestURL = RequestType.requestQoute(defaultURL, symbol, token).url
-        
-        let task = URLSession.shared.dataTask(with: requestURL!) { (data, response, error) in
-            guard let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil else {
-                completion(.failure(.requestFailed))
-                return
-            }
-            do {
-                let dataFromJson = try JSONDecoder().decode(Quote.self, from: data)
-                result = dataFromJson
-                completion(.success(result))
-            } catch {
-                completion(.failure(.quoteError))
-            }
+        switch decodingType {
+        case is Quote.Type:
+            requestURL = RequestType.requestQoute(defaultURL, symbol, token).url
+            errorType = .quoteError
+        case is ImageData.Type:
+            requestURL = RequestType.requestLogo(defaultURL, symbol, token).url
+            errorType = .imageError
+        default:
+            requestURL = RequestType.requestCompanies(defaultURL, token).url
+            errorType = .companiesError
         }
-        task.resume()
-    }
-    
-    static func loadLogo(token: String, symbol: String, completion: @escaping (Result<ImageData, ErrorType>) -> ()) {
-        let defaultURL = "https://cloud.iexapis.com/stable/stock/"
-        var requestURL: URL?
-        var result = ImageData()
-        
-        requestURL = RequestType.requestLogo(defaultURL, symbol, token).url
         
         let task = URLSession.shared.dataTask(with: requestURL!) { (data, response, error) in
             guard let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil else {
@@ -69,11 +34,12 @@ public final class NetworkService {
                 return
             }
             do {
-                let dataFromJson = try JSONDecoder().decode(ImageData.self, from: data)
-                result = dataFromJson
-                completion(.success(result))
+                let dataFromJson = try JSONDecoder().decode(decodingType, from: data)
+                resultData = dataFromJson
+                guard let resultData = resultData else { return }
+                completion(.success(resultData))
             } catch {
-                completion(.failure(.imageError))
+                completion(.failure(errorType))
             }
         }
         task.resume()

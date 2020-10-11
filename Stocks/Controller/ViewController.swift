@@ -57,7 +57,7 @@ final class ViewController: UIViewController {
     private func requestData(requestType: RequestType) {
         switch requestType {
         case .requestCompanies(_, _):
-            NetworkService.loadCompanies(token: token) { result in
+            NetworkService.loadData(decodingType: [Company].self, token: token) { result in
                 switch result {
                 case .success(let array):
                     self.companiesArray = array
@@ -76,7 +76,7 @@ final class ViewController: UIViewController {
             }
         case .requestQoute(_, _, _):
             guard let symbol = symbol else { return }
-            NetworkService.loadQuote(token: token, symbol: symbol) { result in
+            NetworkService.loadData(decodingType: Quote.self, token: token, symbol: symbol) { result in
                 switch result {
                 case .success(let quote):
                     DispatchQueue.main.async { [weak self] in
@@ -89,7 +89,7 @@ final class ViewController: UIViewController {
             }
         case .requestLogo(_, _, _):
             guard let symbol = symbol else { return }
-            NetworkService.loadLogo(token: token, symbol: symbol) { result in
+            NetworkService.loadData(decodingType: ImageData.self, token: token, symbol: symbol) { result in
                 switch result {
                 case .success(let logo):
                     let imageURL = URL(string: logo.url!)

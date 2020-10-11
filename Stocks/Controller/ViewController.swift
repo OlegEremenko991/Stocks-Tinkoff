@@ -25,6 +25,8 @@ final class ViewController: UIViewController {
     
 // MARK: Private properties
     
+    private var alertController: UIAlertController?
+    private var error: ErrorType?
     private let devEmail = "o.n.eremenko@gmail.com" // support email
     private var tempErrorText = "" // stores error text for report
     
@@ -59,23 +61,22 @@ final class ViewController: UIViewController {
     
     private func requestData(dataType: DataType) {
         var stringURL = ""
-        var actionType: ActionType
-        var errorType: ErrorType
+        var actionType: RequestType
         switch dataType {
         case .companies:
             stringURL = "https://cloud.iexapis.com/stable/stock/market/list/mostactive?token=\(token)"
             actionType = .parseCompanies
-            errorType = .noCompanies
+            error = .noCompanies
         case .quote:
             guard let symbol = symbol else { return }
             stringURL = "https://cloud.iexapis.com/stable/stock/\(symbol)/quote?token=\(token)"
             actionType = .parseQuote
-            errorType = .noQuote
+            error = .noQuote
         case .logo:
             guard let symbol = symbol else { return }
             stringURL = "https://cloud.iexapis.com/stable/stock/\(symbol)/logo?token=\(token)"
             actionType = .parseLogo
-            errorType = .noLogo
+            error = .noLogo
         }
         
         guard let url = URL(string: stringURL) else { return }
@@ -91,11 +92,11 @@ final class ViewController: UIViewController {
                     self.parseData(from: data, dataType: .logo)
                 }
             } else {
-                self.showALert(errorType: errorType)
-                print("Network error!")
+                guard let error = self.error else { return }
+                self.showALert(errorType: error)
+                print(error.rawValue)
             }
         }
-        
         dataTask.resume()
     }
     
@@ -183,50 +184,50 @@ final class ViewController: UIViewController {
     }
     
     private func showALert(errorType: ErrorType){
-        var titleText = ""
-        var messageText = "Check your internet connection"
-        var solution: SolutionType
+        var messageText = ""
         
         switch errorType {
         case .noCompanies:
-            titleText = "List of companies is not available"
-            solution = .reloadCompanies
+            messageText = "List of companies is not available"
         case .noQuote:
-            titleText = "Company quotes missing"
-            solution = .reloadStocksData
+            messageText = "Company quotes missing"
         case .noLogo:
-            titleText = "Company logo is not available"
-            solution = .reloadLogo
+            messageText = "Company logo is not available"
         case .invalidData:
-            titleText = "Invalid data"
             messageText = "Please report this issue"
-            solution = .report
         }
         
         DispatchQueue.main.async {
-            let alert = UIAlertController(title: titleText, message: messageText, preferredStyle: .alert)
-            let ignoreAction = UIAlertAction(title: "Ignore", style: .destructive) { [weak self] action in
+            let reloadAction = UIAlertAction(title: "Reload", style: .default, handler: { [weak self] _ in
+                switch self?.error {
+                case .noCompanies:
+                    self?.requestData(dataType: .companies)
+                case .noQuote:
+                    self?.requestData(dataType: .quote)
+                    self?.requestData(dataType: .logo)
+                case .noLogo:
+                    self?.requestData(dataType: .logo)
+                case .invalidData:
+                    let subject = "Report a problem in app"
+                    self?.sendEmail(with: subject)
+                case .none:
+                    return
+                }
+                self?.alertController = nil
+            })
+            let ignoreAction = UIAlertAction(title: "Ignore", style: .destructive, handler: { [weak self] _ in
                 DispatchQueue.main.async {
                     self?.reloadButton.isHidden = false
                 }
-            }
-            let okAction = UIAlertAction(title: "Reload", style: .default) { [weak self] action in
-                switch solution {
-                case .reloadCompanies:
-                    self?.requestData(dataType: .companies)
-                case .reloadStocksData:
-                    self?.requestData(dataType: .quote)
-                    self?.requestData(dataType: .logo)
-                case .reloadLogo:
-                    self?.requestData(dataType: .logo)
-                case .report:
-                    let subject = "Report a problem in app"
-                    self?.sendEmail(with: subject)
-                }
-            }
-            alert.addAction(okAction)
-            alert.addAction(ignoreAction)
-            
+            })
+
+            // Prevent from showing multiple alert controllers
+            guard self.alertController == nil else { return }
+
+            self.alertController = AlertService.customAlert(title: "Error", message: messageText, errorType: errorType, actions: [reloadAction, ignoreAction])
+
+            guard let alert = self.alertController else { return }
+
             self.present(alert, animated: true)
             self.activityIndicator.stopAnimating()
         }

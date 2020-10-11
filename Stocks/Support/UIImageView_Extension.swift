@@ -10,12 +10,17 @@ import UIKit
 
 extension UIImageView {
     
-    // Load image from URL
+    // Load image from URL on background thread and update UI on main thread
     func load(url: URL) {
-        DispatchQueue.main.async { [weak self] in
+        let queue = DispatchQueue.global(qos: .utility)
+        queue.async {
             if let data = try? Data(contentsOf: url) {
-                if let image = UIImage(data: data) {
-                    self?.image = image
+                DispatchQueue.main.async { [weak self] in
+                    self?.image = UIImage(data: data)
+                }
+            } else {
+                DispatchQueue.main.async { [weak self] in
+                    self?.image = UIImage(named: "brand")
                 }
             }
         }
@@ -28,3 +33,5 @@ extension UIImageView {
         self.layer.cornerRadius = 10
     }
 }
+
+

@@ -18,10 +18,6 @@ extension UIImageView {
                 DispatchQueue.main.async { [weak self] in
                     self?.image = UIImage(data: data)
                 }
-            } else {
-                DispatchQueue.main.async { [weak self] in
-                    self?.image = UIImage(named: "brand")
-                }
             }
         }
     }

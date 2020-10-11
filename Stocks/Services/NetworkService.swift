@@ -36,7 +36,7 @@ public final class NetworkService {
     static func loadQuote(token: String, symbol: String, completion: @escaping (Result<Quote, ErrorType>) -> ()) {
         let defaultURL = "https://cloud.iexapis.com/stable/stock/"
         var requestURL: URL?
-        var result: Quote?
+        var result = Quote()
         
         requestURL = RequestType.requestQoute(defaultURL, symbol, token).url
         
@@ -48,7 +48,6 @@ public final class NetworkService {
             do {
                 let dataFromJson = try JSONDecoder().decode(Quote.self, from: data)
                 result = dataFromJson
-                guard let result = result else { return }
                 completion(.success(result))
             } catch {
                 completion(.failure(.quoteError))
@@ -60,7 +59,7 @@ public final class NetworkService {
     static func loadLogo(token: String, symbol: String, completion: @escaping (Result<ImageData, ErrorType>) -> ()) {
         let defaultURL = "https://cloud.iexapis.com/stable/stock/"
         var requestURL: URL?
-        var result: ImageData?
+        var result = ImageData()
         
         requestURL = RequestType.requestLogo(defaultURL, symbol, token).url
         
@@ -72,7 +71,6 @@ public final class NetworkService {
             do {
                 let dataFromJson = try JSONDecoder().decode(ImageData.self, from: data)
                 result = dataFromJson
-                guard let result = result else { return }
                 completion(.success(result))
             } catch {
                 completion(.failure(.imageError))

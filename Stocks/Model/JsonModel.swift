@@ -12,12 +12,12 @@ struct Company: Codable {
 }
 
 struct Quote: Codable {
-    var companyName: String
-    var symbol: String
-    var latestPrice: Double
-    var change: Double
+    var companyName: String? = nil
+    var symbol: String? = nil
+    var latestPrice: Double? = nil
+    var change: Double? = nil
 }
 
 struct ImageData: Codable {
-    var url: String
+    var url: String? = nil
 }

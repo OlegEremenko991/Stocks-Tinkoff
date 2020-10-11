@@ -92,7 +92,7 @@ final class ViewController: UIViewController {
             NetworkService.loadLogo(token: token, symbol: symbol) { result in
                 switch result {
                 case .success(let logo):
-                    let imageURL = URL(string: logo.url)
+                    let imageURL = URL(string: logo.url!)
                     self.logoImageView.load(url: imageURL!)
                 case .failure(let error):
                     self.tempErrorText = error.rawValue
@@ -108,13 +108,13 @@ final class ViewController: UIViewController {
 
         companyNameLabel.text = data.companyName
         companySymbolLabel.text = data.symbol
-        priceLabel.text = "\(data.latestPrice)"
-        priceChangeLabel.text = "\(data.change)"
+        priceLabel.text = "\(data.latestPrice!)"
+        priceChangeLabel.text = "\(data.change!)"
         
         // Change label text color depending on "change" value
-        if data.change > 0 {
+        if data.change! > 0 {
             priceChangeLabel.textColor = .systemGreen
-        } else if data.change < 0 {
+        } else if data.change! < 0 {
             priceChangeLabel.textColor = .systemRed
         }
     }
@@ -157,30 +157,15 @@ final class ViewController: UIViewController {
         let messageText = errorType.rawValue
         
         DispatchQueue.main.async {
-            let reloadAction = UIAlertAction(title: "Reload", style: .default, handler: { _ in
-                switch errorType {
-                case .companiesError:
-                    self.requestData(requestType: .requestCompanies(nil, nil))
-                case .quoteError, .imageError:
-                    self.requestData(requestType: .requestQoute(nil, nil, nil))
-                    self.requestData(requestType: .requestLogo(nil, nil, nil))
-                case .invalidData, .requestFailed:
-                    let subject = "Report a problem in app"
-                    self.sendEmail(with: subject)
-                }
-                self.alertController = nil
-            })
-            let ignoreAction = UIAlertAction(title: "Ignore", style: .destructive, handler: { _ in
-                DispatchQueue.main.async {
-                    self.reloadButton.isHidden = false
-                }
+            let okAction = UIAlertAction(title: "Ok", style: .default, handler: { _ in
+                self.reloadButton.isHidden = false
                 self.alertController = nil
             })
 
             // Prevent from showing multiple alert controllers
             guard self.alertController == nil else { return }
 
-            self.alertController = AlertService.customAlert(title: "Error", message: messageText, actions: [reloadAction, ignoreAction])
+            self.alertController = AlertService.customAlert(title: "Error", message: messageText, actions: [okAction])
 
             guard let alert = self.alertController else { return }
 

@@ -16,12 +16,6 @@ enum ErrorType: String, Error {
     case requestFailed = "Request failed - check your internet connection"
 }
 
-enum DataType {
-    case companies
-    case quote
-    case logo
-}
-
 enum RequestType {
     case requestCompanies(String?, String?)
     case requestQoute(String?, String?, String?)

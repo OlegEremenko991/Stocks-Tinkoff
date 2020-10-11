@@ -160,30 +160,13 @@ final class ViewController: UIViewController {
                 self.reloadButton.isHidden = false
                 self.alertController = nil
             })
-
             // Prevent from showing multiple alert controllers
             guard self.alertController == nil else { return }
 
             self.alertController = AlertService.customAlert(title: "Error", message: messageText, actions: [okAction])
-
             guard let alert = self.alertController else { return }
-
             self.present(alert, animated: true)
             self.activityIndicator.stopAnimating()
-        }
-    }
-    
-    // Report an issue
-    private func sendEmail(with subject: String) {
-        if MFMailComposeViewController.canSendMail() {
-            let mail = MFMailComposeViewController()
-            mail.mailComposeDelegate = self
-            mail.setToRecipients([devEmail])
-            mail.setMessageBody("<p> Error: \(tempErrorText) </p>", isHTML: true)
-            mail.setSubject(subject)
-            present(mail, animated: true)
-        } else {
-            print("error with email")
         }
     }
     
@@ -232,5 +215,18 @@ extension ViewController: UIPickerViewDelegate {
 extension ViewController: MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true)
+    }
+    
+    private func sendEmail(with subject: String) {
+        if MFMailComposeViewController.canSendMail() {
+            let mail = MFMailComposeViewController()
+            mail.mailComposeDelegate = self
+            mail.setToRecipients([devEmail])
+            mail.setMessageBody("<p> Error: \(tempErrorText) </p>", isHTML: true)
+            mail.setSubject(subject)
+            present(mail, animated: true)
+        } else {
+            print("error with email")
+        }
     }
 }

@@ -32,7 +32,7 @@ final class ViewController: UIViewController {
     private var symbol: String? // symbol for data request
     private let token = "sk_2300dc06c77a4de5a7b9b4301594f733" // token to access API data
     
-    private var companiesArray: [Company]? // Companies for UIPickerView
+    private var companiesArray = [Company]() // Companies for UIPickerView
     
 // MARK: - Lifecycle
     
@@ -60,18 +60,13 @@ final class ViewController: UIViewController {
             NetworkService.loadData(decodingType: [Company].self, token: token) { result in
                 switch result {
                 case .success(let array):
-                    self.companiesArray = array
-                    guard let companiesArray = self.companiesArray else { return }
-                    
-                    // sort companies by name
-                    self.companiesArray = companiesArray.sorted(by: { $0.companyName < $1.companyName })
+                    self.companiesArray = array.sorted(by: { $0.companyName < $1.companyName })
                     DispatchQueue.main.async { [weak self] in
                         self?.companyPickerView.reloadAllComponents()
                         self?.requestQuoteUpdate()
                     }
                 case .failure(let error):
-                    self.tempErrorText = error.rawValue
-                    self.showALert(errorType: error)
+                    self.handleError(errorType: error)
                 }
             }
         case .requestQoute(_, _, _):
@@ -83,8 +78,7 @@ final class ViewController: UIViewController {
                         self?.displayStockInfo(data: quote)
                     }
                 case .failure(let error):
-                    self.tempErrorText = error.rawValue
-                    self.showALert(errorType: error)
+                    self.handleError(errorType: error)
                 }
             }
         case .requestLogo(_, _, _):
@@ -95,11 +89,16 @@ final class ViewController: UIViewController {
                     let imageURL = URL(string: logo.url!)
                     self.logoImageView.load(url: imageURL!)
                 case .failure(let error):
-                    self.tempErrorText = error.rawValue
-                    self.showALert(errorType: error)
+                    self.handleError(errorType: error)
                 }
             }
         }
+    }
+    
+    // Save error text for email and show alert
+    private func handleError(errorType: ErrorType) {
+        tempErrorText = errorType.rawValue
+        showALert(errorType: errorType)
     }
     
     // Display parsed data on the screen
@@ -129,7 +128,7 @@ final class ViewController: UIViewController {
         reloadButton.isHidden = true
         
         let selectedRow = companyPickerView.selectedRow(inComponent: 0)
-        symbol = companiesArray?[selectedRow].symbol
+        symbol = companiesArray[selectedRow].symbol
 
         DispatchQueue.global(qos: .default).async {
             self.requestData(requestType: .requestQoute(nil, nil, nil))
@@ -204,13 +203,13 @@ extension ViewController: UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return companiesArray?.count ?? 1
+        return companiesArray.count
     }
     
     // Customize label inside picker view
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         let label = UILabel()
-        label.text = companiesArray?[row].companyName
+        label.text = companiesArray[row].companyName
         label.sizeToFit()
         return label
     }
@@ -220,7 +219,7 @@ extension ViewController: UIPickerViewDataSource {
 
 extension ViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return companiesArray?[row].companyName
+        return companiesArray[row].companyName
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {

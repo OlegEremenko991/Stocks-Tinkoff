@@ -36,7 +36,10 @@ public final class NetworkService {
             do {
                 let dataFromJson = try JSONDecoder().decode(decodingType, from: data)
                 resultData = dataFromJson
-                guard let resultData = resultData else { return }
+                guard let resultData = resultData else {
+                    completion(.failure(.invalidData))
+                    return
+                }
                 completion(.success(resultData))
             } catch {
                 completion(.failure(errorType))

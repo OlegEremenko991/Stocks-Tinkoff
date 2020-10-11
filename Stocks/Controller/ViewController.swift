@@ -26,7 +26,6 @@ final class ViewController: UIViewController {
 // MARK: Private properties
     
     private var alertController: UIAlertController?
-    private var error: ErrorType?
     private let devEmail = "o.n.eremenko@gmail.com" // support email
     private var tempErrorText = "" // stores error text for report
     
@@ -35,16 +34,12 @@ final class ViewController: UIViewController {
     
     private var companiesArray: [Company]? // Companies for UIPickerView
     
-    // Data for the selected company
-    private var quoteData: Quote?
-    private var imageData: ImageData?
-    
 // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
-        requestData(dataType: .companies)
+        requestData(requestType: .requestCompanies(nil, nil))
     }
     
 // MARK: Private methods
@@ -59,78 +54,51 @@ final class ViewController: UIViewController {
         reloadButton.isHidden = true
     }
     
-    private func requestData(dataType: DataType) {
-        var stringURL = ""
-        var actionType: RequestType
-        switch dataType {
-        case .companies:
-            stringURL = "https://cloud.iexapis.com/stable/stock/market/list/mostactive?token=\(token)"
-            actionType = .parseCompanies
-            error = .noCompanies
-        case .quote:
-            guard let symbol = symbol else { return }
-            stringURL = "https://cloud.iexapis.com/stable/stock/\(symbol)/quote?token=\(token)"
-            actionType = .parseQuote
-            error = .noQuote
-        case .logo:
-            guard let symbol = symbol else { return }
-            stringURL = "https://cloud.iexapis.com/stable/stock/\(symbol)/logo?token=\(token)"
-            actionType = .parseLogo
-            error = .noLogo
-        }
-        
-        guard let url = URL(string: stringURL) else { return }
-        
-        let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
-            if let data = data, (response as? HTTPURLResponse)?.statusCode == 200, error == nil {
-                switch actionType {
-                case .parseCompanies:
-                    self.parseData(from: data, dataType: .companies)
-                case .parseQuote:
-                    self.parseData(from: data, dataType: .quote)
-                case .parseLogo:
-                    self.parseData(from: data, dataType: .logo)
+    private func requestData(requestType: RequestType) {
+        switch requestType {
+        case .requestCompanies(_, _):
+            NetworkService.loadCompanies(token: token) { result in
+                switch result {
+                case .success(let array):
+                    self.companiesArray = array
+                    guard let companiesArray = self.companiesArray else { return }
+                    
+                    // sort companies by name
+                    self.companiesArray = companiesArray.sorted(by: { $0.companyName < $1.companyName })
+                    DispatchQueue.main.async { [weak self] in
+                        self?.companyPickerView.reloadAllComponents()
+                        self?.requestQuoteUpdate()
+                    }
+                case .failure(let error):
+                    self.tempErrorText = error.rawValue
+                    self.showALert(errorType: error)
                 }
-            } else {
-                guard let error = self.error else { return }
-                self.showALert(errorType: error)
-                print(error.rawValue)
             }
-        }
-        dataTask.resume()
-    }
-    
-    private func parseData(from data: Data, dataType: DataType) {
-        let jsonDecoder = JSONDecoder()
-        do {
-            switch dataType {
-            case .companies:
-                let dataFromJson = try jsonDecoder.decode([Company].self, from: data)
-                companiesArray = dataFromJson
-                guard companiesArray != nil else { return }
-                companiesArray = companiesArray?.sorted(by: { $0.companyName < $1.companyName }) // sort companies by name
-                DispatchQueue.main.async { [weak self] in
-                    self?.companyPickerView.reloadAllComponents()
-                    self?.requestQuoteUpdate()
+        case .requestQoute(_, _, _):
+            guard let symbol = symbol else { return }
+            NetworkService.loadQuote(token: token, symbol: symbol) { result in
+                switch result {
+                case .success(let quote):
+                    DispatchQueue.main.async { [weak self] in
+                        self?.displayStockInfo(data: quote)
+                    }
+                case .failure(let error):
+                    self.tempErrorText = error.rawValue
+                    self.showALert(errorType: error)
                 }
-            case .quote:
-                let dataFromJson = try jsonDecoder.decode(Quote.self, from: data)
-                quoteData = dataFromJson
-                guard let quoteData = quoteData else { return }
-                DispatchQueue.main.async { [weak self] in
-                    self?.displayStockInfo(data: quoteData)
-                }
-            case .logo:
-                let dataFromJson = try jsonDecoder.decode(ImageData.self, from: data)
-                imageData = dataFromJson
-                guard let imageData = imageData else { return }
-                let imageURL = URL(string: imageData.url)
-                logoImageView.load(url: imageURL!)
             }
-        } catch {
-            print(error)
-            tempErrorText = "\(error)"
-            showALert(errorType: .invalidData)
+        case .requestLogo(_, _, _):
+            guard let symbol = symbol else { return }
+            NetworkService.loadLogo(token: token, symbol: symbol) { result in
+                switch result {
+                case .success(let logo):
+                    let imageURL = URL(string: logo.url)
+                    self.logoImageView.load(url: imageURL!)
+                case .failure(let error):
+                    self.tempErrorText = error.rawValue
+                    self.showALert(errorType: error)
+                }
+            }
         }
     }
     
@@ -163,8 +131,10 @@ final class ViewController: UIViewController {
         let selectedRow = companyPickerView.selectedRow(inComponent: 0)
         symbol = companiesArray?[selectedRow].symbol
 
-        requestData(dataType: .quote)
-        requestData(dataType: .logo)
+        DispatchQueue.global(qos: .default).async {
+            self.requestData(requestType: .requestQoute(nil, nil, nil))
+            self.requestData(requestType: .requestLogo(nil, nil, nil))
+        }
     }
     
     // Update labels text and text color
@@ -184,47 +154,33 @@ final class ViewController: UIViewController {
     }
     
     private func showALert(errorType: ErrorType){
-        var messageText = ""
-        
-        switch errorType {
-        case .noCompanies:
-            messageText = "List of companies is not available"
-        case .noQuote:
-            messageText = "Company quotes missing"
-        case .noLogo:
-            messageText = "Company logo is not available"
-        case .invalidData:
-            messageText = "Please report this issue"
-        }
+        let messageText = errorType.rawValue
         
         DispatchQueue.main.async {
-            let reloadAction = UIAlertAction(title: "Reload", style: .default, handler: { [weak self] _ in
-                switch self?.error {
-                case .noCompanies:
-                    self?.requestData(dataType: .companies)
-                case .noQuote:
-                    self?.requestData(dataType: .quote)
-                    self?.requestData(dataType: .logo)
-                case .noLogo:
-                    self?.requestData(dataType: .logo)
-                case .invalidData:
+            let reloadAction = UIAlertAction(title: "Reload", style: .default, handler: { _ in
+                switch errorType {
+                case .companiesError:
+                    self.requestData(requestType: .requestCompanies(nil, nil))
+                case .quoteError, .imageError:
+                    self.requestData(requestType: .requestQoute(nil, nil, nil))
+                    self.requestData(requestType: .requestLogo(nil, nil, nil))
+                case .invalidData, .requestFailed:
                     let subject = "Report a problem in app"
-                    self?.sendEmail(with: subject)
-                case .none:
-                    return
+                    self.sendEmail(with: subject)
                 }
-                self?.alertController = nil
+                self.alertController = nil
             })
-            let ignoreAction = UIAlertAction(title: "Ignore", style: .destructive, handler: { [weak self] _ in
+            let ignoreAction = UIAlertAction(title: "Ignore", style: .destructive, handler: { _ in
                 DispatchQueue.main.async {
-                    self?.reloadButton.isHidden = false
+                    self.reloadButton.isHidden = false
                 }
+                self.alertController = nil
             })
 
             // Prevent from showing multiple alert controllers
             guard self.alertController == nil else { return }
 
-            self.alertController = AlertService.customAlert(title: "Error", message: messageText, errorType: errorType, actions: [reloadAction, ignoreAction])
+            self.alertController = AlertService.customAlert(title: "Error", message: messageText, actions: [reloadAction, ignoreAction])
 
             guard let alert = self.alertController else { return }
 
@@ -243,14 +199,14 @@ final class ViewController: UIViewController {
             mail.setSubject(subject)
             present(mail, animated: true)
         } else {
-            print("error")
+            print("error with email")
         }
     }
     
 // MARK: IBActions
     
     @IBAction func reloadButtonTapped(_ sender: UIButton) {
-        requestData(dataType: .companies)
+        requestData(requestType: .requestCompanies(nil, nil))
     }
     
 }

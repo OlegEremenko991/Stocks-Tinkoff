@@ -1,5 +1,5 @@
 # Stocks
-Test task made for Tinkoff. The app downloads all data through the Internet.
+This is a test task. The app downloads all data through the Internet.
 
 ## What you can do with this app
 

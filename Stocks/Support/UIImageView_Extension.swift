@@ -22,11 +22,11 @@ extension UIImageView {
         }
     }
     
-    // Set up default image and properties
+    /// Set up default image and properties
     func defaultSetup() {
-        self.image = UIImage(named: "brand")
-        self.backgroundColor = .white
-        self.layer.cornerRadius = 10
+        image = UIImage(named: "brand")
+        backgroundColor = .white
+        layer.cornerRadius = 10
     }
 }
 

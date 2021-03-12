@@ -11,30 +11,44 @@ import MessageUI
 
 final class ViewController: UIViewController {
     
-// MARK: IBOutlets
+    // MARK: - IBOutlets
     
-    @IBOutlet weak var reloadButton: UIButton!
-    @IBOutlet weak var companyNameLabel: UILabel!
-    @IBOutlet weak var companyPickerView: UIPickerView!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var companySymbolLabel: UILabel!
-    @IBOutlet weak var priceLabel: UILabel!
-    @IBOutlet weak var priceChangeLabel: UILabel!
-    @IBOutlet weak var logoImageView: UIImageView!
-    @IBOutlet weak var hintLabel: UILabel!
+    @IBOutlet private weak var reloadButton: UIButton!
+    @IBOutlet private weak var companyNameLabel: UILabel!
+    @IBOutlet private weak var companySymbolLabel: UILabel!
+    @IBOutlet private weak var priceLabel: UILabel!
+    @IBOutlet private weak var priceChangeLabel: UILabel!
+    @IBOutlet private weak var logoImageView: UIImageView!
+    @IBOutlet private weak var hintLabel: UILabel!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView! {
+        didSet { activityIndicator.hidesWhenStopped = true }
+    }
+
+    @IBOutlet weak var companyPickerView: UIPickerView! {
+        didSet {
+            companyPickerView.dataSource = self
+            companyPickerView.delegate = self
+        }
+    }
     
-// MARK: Private properties
+    // MARK: - Private properties
     
     private var alertController: UIAlertController?
-    private let devEmail = "o.n.eremenko@gmail.com" // support email
-    private var tempErrorText = "" // stores error text for report
+    private let devEmail = "support@gmail.com"
+
+    /// Stores error text for report
+    private var tempErrorText = ""
+
+    /// Symbol for data request
+    private var symbol: String?
+
+    /// Token to access API data
+    private let token = "sk_2300dc06c77a4de5a7b9b4301594f733"
+
+    /// Companies for UIPickerView
+    private var companiesArray = [Company]()
     
-    private var symbol: String? // symbol for data request
-    private let token = "sk_2300dc06c77a4de5a7b9b4301594f733" // token to access API data
-    
-    private var companiesArray = [Company]() // Companies for UIPickerView
-    
-// MARK: - Lifecycle
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,14 +56,9 @@ final class ViewController: UIViewController {
         requestData(requestType: .requestCompanies(nil, nil))
     }
     
-// MARK: Private methods
+    // MARK: - Private methods
     
     private func setupView() {
-        companyPickerView.dataSource = self
-        companyPickerView.delegate = self
-        
-        activityIndicator.hidesWhenStopped = true
-        
         hintLabel.isHidden = true
         reloadButton.isHidden = true
     }
@@ -95,13 +104,13 @@ final class ViewController: UIViewController {
         }
     }
     
-    // Save error text for email and show alert
+    /// Save error text for email and show alert
     private func handleError(errorType: ErrorType) {
         tempErrorText = errorType.rawValue
         showALert(errorType: errorType)
     }
     
-    // Display parsed data on the screen
+    /// Display parsed data on the screen
     private func displayStockInfo(data: Quote) {
         activityIndicator.stopAnimating()
 
@@ -111,17 +120,15 @@ final class ViewController: UIViewController {
         priceChangeLabel.text = "\(data.change!)"
         
         // Change label text color depending on "change" value
-        if data.change! > 0 {
-            priceChangeLabel.textColor = .systemGreen
-        } else if data.change! < 0 {
-            priceChangeLabel.textColor = .systemRed
+        if let changeValue = data.change {
+            priceChangeLabel.textColor = changeValue > 0 ? .systemGreen : .systemRed
         }
     }
     
     private func requestQuoteUpdate() {
         activityIndicator.startAnimating()
         companyNameLabel.numberOfLines = 2
-        logoImageView.defaultSetup() // setup default image and properties
+        logoImageView.defaultSetup()
         
         updateLabels()
         hintLabel.isHidden = false
@@ -136,13 +143,13 @@ final class ViewController: UIViewController {
         }
     }
     
-    // Update labels text and text color
+    /// Update labels text and text color
     private func updateLabels() {
         let labelArray = [companyNameLabel, companySymbolLabel, priceLabel, priceChangeLabel]
-        for x in labelArray {
-            x?.text = "-"
-            x?.textColor = UIColor { tc in
-                switch tc.userInterfaceStyle {
+        for label in labelArray {
+            label?.text = "-"
+            label?.textColor = UIColor { color in
+                switch color.userInterfaceStyle {
                 case .dark:
                     return .white
                 default:
@@ -156,10 +163,10 @@ final class ViewController: UIViewController {
         let messageText = errorType.rawValue
         
         DispatchQueue.main.async {
-            let okAction = UIAlertAction(title: "Ok", style: .default, handler: { _ in
+            let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
                 self.reloadButton.isHidden = false
                 self.alertController = nil
-            })
+            }
             // Prevent from showing multiple alert controllers
             guard self.alertController == nil else { return }
 
@@ -170,7 +177,7 @@ final class ViewController: UIViewController {
         }
     }
     
-// MARK: IBActions
+    // MARK: - IBActions
     
     @IBAction func reloadButtonTapped(_ sender: UIButton) {
         requestData(requestType: .requestCompanies(nil, nil))
@@ -178,15 +185,13 @@ final class ViewController: UIViewController {
     
 }
 
-// MARK: UIPickerViewDataSource
+// MARK: - UIPickerViewDataSource
 
 extension ViewController: UIPickerViewDataSource {
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
+    func numberOfComponents(in pickerView: UIPickerView) -> Int { 1 }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return companiesArray.count
+        companiesArray.count
     }
     
     // Customize label inside picker view
@@ -198,11 +203,11 @@ extension ViewController: UIPickerViewDataSource {
     }
 }
 
-// MARK: UIPickerViewDelegate
+// MARK: - UIPickerViewDelegate
 
 extension ViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return companiesArray[row].companyName
+        companiesArray[row].companyName
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
@@ -210,7 +215,7 @@ extension ViewController: UIPickerViewDelegate {
     }
 }
 
-// MARK: MFMailComposeViewControllerDelegate
+// MARK: - MFMailComposeViewControllerDelegate
 
 extension ViewController: MFMailComposeViewControllerDelegate {
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {

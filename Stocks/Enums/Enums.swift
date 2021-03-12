@@ -21,11 +21,9 @@ enum RequestType {
     case requestQoute(String?, String?, String?)
     case requestLogo(String?, String?, String?)
     
-    var url: URL? {
-        return URL(string: stringURL)
-    }
+    var url: URL? { URL(string: stringURL) }
     
-    var stringURL: String {
+    private var stringURL: String {
         switch self {
         case .requestCompanies(let defaultURL, let token):
             return defaultURL! + "market/list/mostactive?token=" + token!

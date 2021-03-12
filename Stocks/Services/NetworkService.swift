@@ -8,7 +8,7 @@
 
 import UIKit
 
-public final class NetworkService {
+final class NetworkService {
     
     static func loadData<T: Decodable>(decodingType: T.Type, token: String, symbol: String? = nil, completion: @escaping (Result<T, ErrorType>) -> ()) {
         let defaultURL = "https://cloud.iexapis.com/stable/stock/"
